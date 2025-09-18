@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3 uid="uid://bjpmht1ig2xuo"]
+
+[ext_resource type="Script" uid="uid://bk8u71a0fp1nu" path="res://Scripts/EngineManager.gd" id="1_r150o"]
+[ext_resource type="Script" uid="uid://c8bllydr26a6x" path="res://Scripts/GameboardBaseTexture.gd" id="2_idj7w"]
+[ext_resource type="Script" uid="uid://cnfrn37nbyr8v" path="res://Scripts/Camera.gd" id="2_kln2b"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_r150o")
+
+[node name="Camera" type="Camera2D" parent="."]
+script = ExtResource("2_kln2b")
+
+[node name="GameboardBaseTexture" type="Node2D" parent="."]
+script = ExtResource("2_idj7w")
