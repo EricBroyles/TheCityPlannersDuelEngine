@@ -15,19 +15,9 @@ func _ready() -> void:
 	zoom = Vector2(start_zoom, start_zoom)
 	
 func _process(delta: float) -> void:
+	EngineData.mouse_position = get_global_mouse_position()
 	perform_move(delta)
-	perform_zoom(delta)
-	
-func perform_zoom(delta: float) -> void:
-	zoom_change = Vector2.ZERO
-	if Input.is_action_just_released("zoom camera in"):
-		zoom_change = Vector2.ONE * zoom_speed
-	if Input.is_action_just_released("zoom camera out"):
-		zoom_change = Vector2.ONE * -zoom_speed
-	if zoom_change != Vector2.ZERO:
-		zoom_change += zoom
-		zoom = Vector2(clamp(zoom_change.x, zoom_out_limit, zoom_in_limit), 
-					   clamp(zoom_change.y, zoom_out_limit, zoom_in_limit))
+	perform_zoom()
 	
 func perform_move(delta: float):
 	movement_dirvec = Vector2.ZERO 
@@ -41,5 +31,16 @@ func perform_move(delta: float):
 		movement_dirvec.x += 1
 	req_movement = movement_dirvec.normalized() * move_speed * delta * 1/zoom 
 	position += req_movement
+	
+func perform_zoom() -> void:
+	zoom_change = Vector2.ZERO
+	if Input.is_action_just_released("zoom camera in"):
+		zoom_change = Vector2.ONE * zoom_speed 
+	if Input.is_action_just_released("zoom camera out"):
+		zoom_change = Vector2.ONE * -zoom_speed 
+	if zoom_change != Vector2.ZERO:
+		zoom_change += zoom
+		zoom = Vector2(clamp(zoom_change.x, zoom_out_limit, zoom_in_limit), 
+					   clamp(zoom_change.y, zoom_out_limit, zoom_in_limit))
 	
 	

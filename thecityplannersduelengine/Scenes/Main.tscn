@@ -1,14 +1,34 @@
-[gd_scene load_steps=4 format=3 uid="uid://bjpmht1ig2xuo"]
+[gd_scene load_steps=7 format=3 uid="uid://bjpmht1ig2xuo"]
 
-[ext_resource type="Script" uid="uid://bk8u71a0fp1nu" path="res://Scripts/EngineManager.gd" id="1_r150o"]
-[ext_resource type="Script" uid="uid://c8bllydr26a6x" path="res://Scripts/GameboardBaseTexture.gd" id="2_idj7w"]
+[ext_resource type="Script" uid="uid://bk8u71a0fp1nu" path="res://Scripts/Main.gd" id="1_r150o"]
 [ext_resource type="Script" uid="uid://cnfrn37nbyr8v" path="res://Scripts/Camera.gd" id="2_kln2b"]
+[ext_resource type="Script" uid="uid://6a153d6v54ts" path="res://Scripts/InputManager.gd" id="2_pbw6q"]
+[ext_resource type="Script" uid="uid://cdnxvpxmfnxev" path="res://Scripts/GameboardPlacer.gd" id="4_rgh2o"]
+[ext_resource type="Script" uid="uid://ctf1rms064gx4" path="res://Scripts/GameboardViewer.gd" id="4_v1gob"]
+[ext_resource type="Script" uid="uid://bsmfp0isa7bqw" path="res://Scripts/Gameboard.gd" id="5_v1gob"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_r150o")
 
+[node name="InputManager" type="Node" parent="."]
+script = ExtResource("2_pbw6q")
+
+[node name="GameboardPlacer" type="Node2D" parent="InputManager"]
+script = ExtResource("4_rgh2o")
+
 [node name="Camera" type="Camera2D" parent="."]
 script = ExtResource("2_kln2b")
 
-[node name="GameboardBaseTexture" type="Node2D" parent="."]
-script = ExtResource("2_idj7w")
+[node name="Gameboard" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("5_v1gob")
+
+[node name="GameboardViewer" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("4_v1gob")
+
+[node name="CellsStaticSprite" type="Sprite2D" parent="GameboardViewer"]
+unique_name_in_owner = true
+
+[node name="TriSubCellsMesh" type="MultiMeshInstance2D" parent="GameboardViewer"]
+unique_name_in_owner = true
