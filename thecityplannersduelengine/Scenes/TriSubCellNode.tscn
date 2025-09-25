@@ -1,9 +1,0 @@
-[gd_scene format=3 uid="uid://djw1cr3fremji"]
-
-[node name="TriSubCellNode" type="Node2D"]
-
-[node name="Polygon2D" type="Polygon2D" parent="."]
-position = Vector2(-5, -5)
-color = Color(0.501961, 0.501961, 0.501961, 1)
-polygon = PackedVector2Array(5, 5, 0, 10, 10, 10)
-uv = PackedVector2Array(0, 0, 0, 99, 100, 99)

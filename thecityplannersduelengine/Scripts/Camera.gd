@@ -1,10 +1,10 @@
 extends Camera2D
 
 var move_speed: float = 500 #px/sec
-var zoom_speed: float = .025 
-var start_zoom: float = .05
+var zoom_speed: float = .025*2 
+var start_zoom: float = .5
 var zoom_out_limit: float = .02
-var zoom_in_limit: float = 1.5
+var zoom_in_limit: float = 3
 
 var movement_dirvec: Vector2 = Vector2.ZERO
 var req_movement: Vector2 = Vector2.ZERO
