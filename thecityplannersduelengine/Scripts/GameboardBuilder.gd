@@ -46,6 +46,8 @@ func _ready() -> void:
 			Vector2(w,2*w) + Vector2(1,1)*(n-3)*w, 
 			Vector2(2*w,w) + Vector2(1,1)*(n-3)*w
 		]
+		
+	print(size_levels_rot45)
 	
 func _process(_delta: float) -> void:
 	if active_option != OPTIONS.NONE:
@@ -53,35 +55,13 @@ func _process(_delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	## OPTIONS SELECT
-	
-	if event.is_action_released("road"):
+	if event.is_action_released("road")  and Input.is_key_pressed(KEY_CTRL):
 		clear()
-		#Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 		active_option = OPTIONS.DRAW_ROADS
 		draw_mesh()
 		
 	elif event.is_action_released("walkway"):
 		pass
-	
-	
-	## OPTION MODIFIER
-	elif event.is_action_released("increase"):
-		active_size_level = clamp(active_size_level + 1, size_level_min, size_level_max)
-		print(active_size_level)
-		draw_mesh()
-	elif event.is_action_released("decrease"):
-		active_size_level = clamp(active_size_level - 1, size_level_min, size_level_max)
-		draw_mesh()
-	if event.is_action_released("rotate"):
-		print("rotate")
-		if active_size_level == 1 or active_size_level == 2:
-			orientation_degrees += 90 
-		else:
-			orientation_degrees += 45
-		orientation_degrees = orientation_degrees % 360 # Wrap to [0, 360)
-		draw_mesh()
-		
-	
 	elif event.is_action_released("place on gameboard"):
 		pass
 	elif event.is_action_released("remove from gameboard"):
@@ -90,16 +70,21 @@ func _input(event: InputEvent) -> void:
 	## MISC
 	elif event.is_action_released("clear"):
 		clear()
-		
 	elif event.is_action_released("help"):
-		print("--- Custom Input Actions ---")
-		for action_name in Utils.get_custom_input_action_names():
-			var events := InputMap.action_get_events(action_name)
-			var event_texts: Array[String] = []
-			for ev in events:
-				event_texts.append(ev.as_text())
-			print("%s --> %s" % [action_name, ", ".join(event_texts)])
-		print("--- End of List ---")
+		display_help()
+	
+	
+	## OPTION MODIFIER
+	if active_option != OPTIONS.NONE:
+		if event.is_action_released("increase"):
+			increment_draw_mesh(1)
+		elif event.is_action_released("decrease"):
+			increment_draw_mesh(-1)
+		elif event.is_action_released("rotate") and not Input.is_key_pressed(KEY_CTRL):
+			rotate_draw_mesh()
+			
+	
+	
 		
 	
 func clear() -> void:
@@ -110,40 +95,65 @@ func clear() -> void:
 	mesh_instance.rotation = 0
 	mesh_instance.mesh = ArrayMesh.new()
 	
+func rotate_draw_mesh() -> void:
+	if active_size_level == 1 or active_size_level == 2:
+		orientation_degrees += 90 
+	else:
+		orientation_degrees += 45
+	orientation_degrees = orientation_degrees % 360 # Wrap to [0, 360)
+	draw_mesh()
+	
+func increment_draw_mesh(incr: int) -> void:
+	active_size_level = clamp(active_size_level + incr, size_level_min, size_level_max)
+	if active_size_level == 1 or active_size_level == 2:
+		#snap to nearest 90 degree
+		orientation_degrees = int(round(orientation_degrees / 90.0) * 90.0)
+		orientation_degrees = orientation_degrees % 360 
+	draw_mesh()
+	
 func draw_mesh() -> void:
 	var pts: PackedVector2Array
-	
+	var angle: float = deg_to_rad(orientation_degrees)
 	# pick base polygon
 	if orientation_degrees % 90 == 0:
 		pts = size_levels.get(active_size_level, PackedVector2Array())
 	else:
 		pts = size_levels_rot45.get(active_size_level, PackedVector2Array())
+		angle -= deg_to_rad(45)
 	
 	if pts.is_empty():
 		push_error("No polygon for level %d" % active_size_level)
 		return
 	
 	# convert orientation_degrees to radians
-	var angle := deg_to_rad(orientation_degrees)
-	var rot := Transform2D(angle, Vector2.ZERO)  # rotation matrix around (0,0)
+	var rot: Transform2D = Transform2D(angle, Vector2.ZERO)  # rotation matrix around (0,0)
 	
 	# rotate each point
-	var rotated_pts := PackedVector2Array()
+	var rotated_pts: PackedVector2Array = PackedVector2Array()
 	for p in pts:
-		rotated_pts.append(rot * p)   # <-- works in Godot 4
+		rotated_pts.append(rot * p)  
 	
 	# create mesh from rotated polygon
 	mesh_instance.mesh = create_polygon_mesh(rotated_pts)
 	
-	
 func create_polygon_mesh(points: PackedVector2Array) -> ArrayMesh:
-	var mesh = ArrayMesh.new()
-	var indices = PackedInt32Array(Geometry2D.triangulate_polygon(points))
-	var arrays = []
+	var mesh: ArrayMesh = ArrayMesh.new()
+	var indices: PackedInt32Array = PackedInt32Array(Geometry2D.triangulate_polygon(points))
+	var arrays: Array = []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = points
 	arrays[Mesh.ARRAY_INDEX] = indices
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	return mesh
+	
+func display_help() -> void:
+	print("--- Custom Input Actions ---")
+	for action_name in Utils.get_custom_input_action_names():
+		var events := InputMap.action_get_events(action_name)
+		var event_texts: Array[String] = []
+		for ev in events:
+			event_texts.append(ev.as_text())
+		print("%s --> %s" % [action_name, ", ".join(event_texts)])
+	print("--- End of List ---")
 	
 	
