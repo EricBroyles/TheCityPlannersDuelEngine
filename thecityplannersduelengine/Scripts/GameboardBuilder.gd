@@ -46,12 +46,13 @@ func _ready() -> void:
 			Vector2(w,2*w) + Vector2(1,1)*(n-3)*w, 
 			Vector2(2*w,w) + Vector2(1,1)*(n-3)*w
 		]
-		
-	print(size_levels_rot45)
 	
 func _process(_delta: float) -> void:
 	if active_option != OPTIONS.NONE:
-		mesh_instance.position = EngineData.mouse_position
+		
+		move_mesh(EngineData.mouse_position)
+		
+		#mesh_instance.position = EngineData.mouse_position
 
 func _input(event: InputEvent) -> void:
 	## OPTIONS SELECT
@@ -83,10 +84,6 @@ func _input(event: InputEvent) -> void:
 		elif event.is_action_released("rotate") and not Input.is_key_pressed(KEY_CTRL):
 			rotate_draw_mesh()
 			
-	
-	
-		
-	
 func clear() -> void:
 	#Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	active_option = OPTIONS.NONE
@@ -110,6 +107,11 @@ func increment_draw_mesh(incr: int) -> void:
 		orientation_degrees = int(round(orientation_degrees / 90.0) * 90.0)
 		orientation_degrees = orientation_degrees % 360 
 	draw_mesh()
+	
+func move_mesh(req_mesh_origin_pos: Vector2) -> void:
+	var new_pos: Vector2 = round(req_mesh_origin_pos / EngineData.GB_CELL_WIDTH) * EngineData.GB_CELL_WIDTH
+	mesh_instance.position = new_pos
+	
 	
 func draw_mesh() -> void:
 	var pts: PackedVector2Array
