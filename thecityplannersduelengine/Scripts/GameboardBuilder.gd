@@ -49,16 +49,14 @@ func _ready() -> void:
 	
 func _process(_delta: float) -> void:
 	if active_option != OPTIONS.NONE:
-		
 		move_mesh(EngineData.mouse_position)
-		
-		#mesh_instance.position = EngineData.mouse_position
 
 func _input(event: InputEvent) -> void:
 	## OPTIONS SELECT
 	if event.is_action_released("road")  and Input.is_key_pressed(KEY_CTRL):
 		clear()
 		active_option = OPTIONS.DRAW_ROADS
+		color_mesh(EngineData.ROAD_COLOR)
 		draw_mesh()
 		
 	elif event.is_action_released("walkway"):
@@ -85,12 +83,15 @@ func _input(event: InputEvent) -> void:
 			rotate_draw_mesh()
 			
 func clear() -> void:
-	#Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	active_option = OPTIONS.NONE
 	active_size_level = 1
 	orientation_degrees = 0
 	mesh_instance.rotation = 0
+	color_mesh(Color.WHITE)
 	mesh_instance.mesh = ArrayMesh.new()
+	
+func color_mesh(color: Color) -> void:
+	mesh_instance.modulate = color
 	
 func rotate_draw_mesh() -> void:
 	if active_size_level == 1 or active_size_level == 2:
@@ -112,30 +113,23 @@ func move_mesh(req_mesh_origin_pos: Vector2) -> void:
 	var new_pos: Vector2 = round(req_mesh_origin_pos / EngineData.GB_CELL_WIDTH) * EngineData.GB_CELL_WIDTH
 	mesh_instance.position = new_pos
 	
-	
 func draw_mesh() -> void:
 	var pts: PackedVector2Array
 	var angle: float = deg_to_rad(orientation_degrees)
-	# pick base polygon
 	if orientation_degrees % 90 == 0:
 		pts = size_levels.get(active_size_level, PackedVector2Array())
 	else:
 		pts = size_levels_rot45.get(active_size_level, PackedVector2Array())
 		angle -= deg_to_rad(45)
-	
 	if pts.is_empty():
 		push_error("No polygon for level %d" % active_size_level)
 		return
 	
-	# convert orientation_degrees to radians
 	var rot: Transform2D = Transform2D(angle, Vector2.ZERO)  # rotation matrix around (0,0)
-	
-	# rotate each point
 	var rotated_pts: PackedVector2Array = PackedVector2Array()
 	for p in pts:
 		rotated_pts.append(rot * p)  
 	
-	# create mesh from rotated polygon
 	mesh_instance.mesh = create_polygon_mesh(rotated_pts)
 	
 func create_polygon_mesh(points: PackedVector2Array) -> ArrayMesh:

@@ -6,3 +6,5 @@ const GB_COLS: int = 100
 const GB_CELL_WIDTH: int = 10 #px
 
 var mouse_position: Vector2
+
+const ROAD_COLOR: Color = Color("#78A2CE")
