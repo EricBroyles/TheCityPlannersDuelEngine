@@ -21,13 +21,13 @@ enum OPTIONS {
 #Note: each of these shapes has the 0,0 that is at the top left corner of a cell
 const w: int = EngineData.GB_CELL_WIDTH
 var size_levels: Dictionary = {
-	1: [Vector2(w,w)/2, Vector2(w,w), Vector2(0, w)], #level 1 triangle
-	2: [Vector2(0,0), Vector2(w,w), Vector2(0, w)], #level 2 right triangle
-	3: [Vector2(0,0), Vector2(0, w), Vector2(w,w), Vector2(w,0)] #level 3 square
+	1: [Vector2(w,w)/2, Vector2(w,w), Vector2(0, w)] as Array[Vector2], #level 1 triangle
+	2: [Vector2(0,0), Vector2(w,w), Vector2(0, w)] as Array[Vector2], #level 2 right triangle
+	3: [Vector2(0,0), Vector2(0, w), Vector2(w,w), Vector2(w,0)] as Array[Vector2] #level 3 square
 }
 
 var size_levels_rot45: Dictionary = {
-	3: [Vector2(w,0), Vector2(0, w), Vector2(w,2*w), Vector2(2*w,w)] #level 3 rotated 45 square 
+	3: [Vector2(w,0), Vector2(0, w), Vector2(w,2*w), Vector2(2*w,w)] as Array[Vector2] #level 3 rotated 45 square 
 }
 
 var orientation_degrees: int = 0
@@ -37,15 +37,29 @@ var active_size_level: int = 1
 var active_option: int = OPTIONS.NONE
 
 func _ready() -> void:
-	for n in range(4, size_level_max+1):
-		size_levels[n] = [Vector2(0,0), Vector2(0,w), Vector2(w+(n-3)*w,w),Vector2(w+(n-3)*w,0)]
-	for n in range(4, size_level_max+1):
-		size_levels_rot45[n] = [
-			Vector2(w,0), 
-			Vector2(0, w), 
-			Vector2(w,2*w) + Vector2(1,1)*(n-3)*w, 
-			Vector2(2*w,w) + Vector2(1,1)*(n-3)*w
+	for n in range(4, size_level_max + 1):
+		var verts: Array[Vector2] = [
+			Vector2(0, 0),
+			Vector2(0, w),
+			Vector2(w + (n - 3) * w, w),
+			Vector2(w + (n - 3) * w, 0)
 		]
+		size_levels[n] = verts as Array[Vector2]
+
+	for n in range(4, size_level_max + 1):
+		var verts_rot: Array[Vector2] = [
+			Vector2(w, 0),
+			Vector2(0, w),
+			Vector2(w, 2 * w) + Vector2(1, 1) * (n - 3) * w,
+			Vector2(2 * w, w) + Vector2(1, 1) * (n - 3) * w
+		]
+		size_levels_rot45[n] = verts_rot as Array[Vector2]
+		
+	print(Utils.divide_polygon_into_triangles(size_levels[1])) #1
+	print(Utils.divide_polygon_into_triangles(size_levels[2])) #2
+	print(Utils.divide_polygon_into_triangles(size_levels[3])) #4
+	print(Utils.divide_polygon_into_triangles(size_levels[4])) #8
+	print(Utils.divide_polygon_into_triangles(size_levels[5])) #12
 	
 func _process(_delta: float) -> void:
 	if active_option != OPTIONS.NONE:
@@ -93,6 +107,10 @@ func clear() -> void:
 func color_mesh(color: Color) -> void:
 	mesh_instance.modulate = color
 	
+func move_mesh(req_mesh_origin_pos: Vector2) -> void:
+	var new_pos: Vector2 = round(req_mesh_origin_pos / EngineData.GB_CELL_WIDTH) * EngineData.GB_CELL_WIDTH
+	mesh_instance.position = new_pos
+	
 func rotate_draw_mesh() -> void:
 	if active_size_level == 1 or active_size_level == 2:
 		orientation_degrees += 90 
@@ -108,10 +126,6 @@ func increment_draw_mesh(incr: int) -> void:
 		orientation_degrees = int(round(orientation_degrees / 90.0) * 90.0)
 		orientation_degrees = orientation_degrees % 360 
 	draw_mesh()
-	
-func move_mesh(req_mesh_origin_pos: Vector2) -> void:
-	var new_pos: Vector2 = round(req_mesh_origin_pos / EngineData.GB_CELL_WIDTH) * EngineData.GB_CELL_WIDTH
-	mesh_instance.position = new_pos
 	
 func draw_mesh() -> void:
 	var pts: PackedVector2Array

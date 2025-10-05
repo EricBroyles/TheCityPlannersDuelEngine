@@ -32,3 +32,5 @@ unique_name_in_owner = true
 
 [node name="TriSubCellsMesh" type="MultiMeshInstance2D" parent="GameboardViewer"]
 unique_name_in_owner = true
+
+[node name="AgentViewer" type="Node2D" parent="."]
