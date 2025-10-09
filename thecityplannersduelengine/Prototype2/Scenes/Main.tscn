@@ -1,0 +1,40 @@
+[gd_scene load_steps=4 format=3 uid="uid://cifkbhdb8qik8"]
+
+[ext_resource type="Script" uid="uid://luvjnhqrdta5" path="res://Prototype2/Scripts/Camera.gd" id="1_u15u8"]
+[ext_resource type="Script" uid="uid://2ak83vgbmn0d" path="res://Prototype2/Scripts/Gameboard.gd" id="2_bbn6i"]
+[ext_resource type="Script" uid="uid://c5fpyw1bqx1o6" path="res://Prototype2/Scripts/GameboardBuilder.gd" id="3_bbn6i"]
+
+[node name="Main" type="Node2D"]
+
+[node name="Camera" type="Camera2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("1_u15u8")
+
+[node name="Gameboard" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_bbn6i")
+
+[node name="GridTilesSprite" type="Sprite2D" parent="Gameboard"]
+unique_name_in_owner = true
+
+[node name="GridCellsSprite" type="Sprite2D" parent="Gameboard"]
+unique_name_in_owner = true
+
+[node name="TerrainMesh" type="MeshInstance2D" parent="Gameboard"]
+unique_name_in_owner = true
+
+[node name="JunctionSprites" type="Node2D" parent="Gameboard"]
+unique_name_in_owner = true
+
+[node name="LaneDividersMesh" type="MeshInstance2D" parent="Gameboard"]
+unique_name_in_owner = true
+
+[node name="Builder" type="Node2D" parent="Gameboard"]
+unique_name_in_owner = true
+script = ExtResource("3_bbn6i")
+
+[node name="BodySprites" type="Node2D" parent="Gameboard/Builder"]
+unique_name_in_owner = true
+
+[node name="BodyMesh" type="MeshInstance2D" parent="Gameboard/Builder"]
+unique_name_in_owner = true

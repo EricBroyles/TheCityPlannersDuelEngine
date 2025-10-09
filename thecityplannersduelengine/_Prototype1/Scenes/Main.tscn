@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3 uid="uid://bjpmht1ig2xuo"]
+
+[ext_resource type="Script" uid="uid://bk8u71a0fp1nu" path="res://_Prototype1/Scripts/Main.gd" id="1_bcm2d"]
+[ext_resource type="Script" uid="uid://cnfrn37nbyr8v" path="res://_Prototype1/Scripts/Camera.gd" id="2_iqynr"]
+[ext_resource type="Script" uid="uid://bsmfp0isa7bqw" path="res://_Prototype1/Scripts/Gameboard.gd" id="3_fqped"]
+[ext_resource type="Script" uid="uid://bsm740uau554j" path="res://_Prototype1/Scripts/GameboardBuilder.gd" id="4_7hdyv"]
+[ext_resource type="Script" uid="uid://ctf1rms064gx4" path="res://_Prototype1/Scripts/GameboardViewer.gd" id="5_1y4ey"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_bcm2d")
+
+[node name="Camera" type="Camera2D" parent="."]
+script = ExtResource("2_iqynr")
+
+[node name="Gameboard" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("3_fqped")
+
+[node name="GameboardBuilder" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("4_7hdyv")
+
+[node name="BuilderMesh" type="MeshInstance2D" parent="GameboardBuilder"]
+unique_name_in_owner = true
+
+[node name="GameboardViewer" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("5_1y4ey")
+
+[node name="CellsStaticSprite" type="Sprite2D" parent="GameboardViewer"]
+unique_name_in_owner = true
+
+[node name="TriSubCellsMesh" type="MultiMeshInstance2D" parent="GameboardViewer"]
+unique_name_in_owner = true
+
+[node name="AgentViewer" type="Node2D" parent="."]

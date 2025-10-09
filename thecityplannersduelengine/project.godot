@@ -15,7 +15,7 @@ config/features=PackedStringArray("4.4", "Mobile")
 
 [autoload]
 
-EngineData="*res://Scripts/EngineData.gd"
+EngineData="*res://Prototype2/Scripts/EngineData.gd"
 
 [input]
 

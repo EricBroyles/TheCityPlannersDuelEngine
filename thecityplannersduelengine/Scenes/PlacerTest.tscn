@@ -1,9 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://521yl284qy4h"]
-
-[ext_resource type="Script" uid="uid://bgkh0gn384twp" path="res://Scenes/placer_test.gd" id="1_6a1mr"]
-
-[node name="PlacerTest" type="Sprite2D"]
-script = ExtResource("1_6a1mr")
-
-[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
-unique_name_in_owner = true

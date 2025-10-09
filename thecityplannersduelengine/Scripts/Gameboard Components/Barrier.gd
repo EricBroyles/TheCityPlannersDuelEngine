@@ -1,2 +1,0 @@
-extends GameboardComponent
-class_name Barrier
