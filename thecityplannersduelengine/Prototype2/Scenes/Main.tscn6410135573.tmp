@@ -33,5 +33,8 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 script = ExtResource("3_bbn6i")
 
+[node name="BodySprites" type="Node2D" parent="Gameboard/Builder"]
+unique_name_in_owner = true
+
 [node name="BodyMesh" type="MeshInstance2D" parent="Gameboard/Builder"]
 unique_name_in_owner = true
