@@ -29,9 +29,12 @@ unique_name_in_owner = true
 [node name="LaneDividersMesh" type="MeshInstance2D" parent="Gameboard"]
 unique_name_in_owner = true
 
-[node name="Builder" type="Node2D" parent="Gameboard"]
+[node name="Builder" type="Node" parent="Gameboard"]
 unique_name_in_owner = true
 script = ExtResource("3_bbn6i")
 
-[node name="BodyMesh" type="MeshInstance2D" parent="Gameboard/Builder"]
+[node name="BodyMeshInstance" type="MeshInstance2D" parent="Gameboard/Builder"]
+unique_name_in_owner = true
+
+[node name="BodySprite" type="Sprite2D" parent="Gameboard/Builder"]
 unique_name_in_owner = true

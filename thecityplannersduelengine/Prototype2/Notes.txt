@@ -1,5 +1,6 @@
-Index: Vector2(r,c)
-even though index.x = r and r is in th y 
+Index: Vector2(c,r)
+Size: vector2(c,r)
+
 
 
 1 ft = 10 px
