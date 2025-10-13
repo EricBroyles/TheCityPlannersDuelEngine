@@ -16,11 +16,19 @@ func _ready() -> void:
 	
 func _process(delta: float) -> void:
 	EngineData.mouse_position = get_global_mouse_position()
-	#print(position)
-	#print(get_viewport_rect().size * zoom)
-	
+	EngineData.view_box = get_camera_view_box()
+	print(EngineData.view_box)
 	perform_move(delta)
 	perform_zoom()
+	
+func get_camera_view_box() -> Vector4:
+	var c: float = position.x / EngineData.CELL_WIDTH_PX
+	var r: float = position.y / EngineData.CELL_WIDTH_PX
+	var size_c: float = get_viewport_rect().size.x / zoom.x / EngineData.CELL_WIDTH_PX
+	var size_r: float = get_viewport_rect().size.y / zoom.x / EngineData.CELL_WIDTH_PX
+	return Vector4(c,r,size_c,size_r)
+	
+	
 	
 func perform_move(delta: float):
 	movement_dirvec = Vector2.ZERO 
@@ -45,5 +53,7 @@ func perform_zoom() -> void:
 		zoom_change += zoom
 		zoom = Vector2(clamp(zoom_change.x, zoom_out_limit, zoom_in_limit), 
 					   clamp(zoom_change.y, zoom_out_limit, zoom_in_limit))
+					
+
 	
 	

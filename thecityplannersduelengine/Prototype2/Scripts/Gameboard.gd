@@ -7,8 +7,8 @@ class_name Gameboard
 @onready var lane_dividers_mesh = %LaneDividersMesh
 @onready var builder = %Builder
 
-var cell_cols: int = 12
-var cell_rows: int = 10
+var cell_cols: int = 58
+var cell_rows: int = 33
 var _w: int = EngineData.CELL_WIDTH_PX
 var matrix: GameboardMatrix
 
