@@ -14,9 +14,6 @@ script = ExtResource("1_u15u8")
 unique_name_in_owner = true
 script = ExtResource("2_bbn6i")
 
-[node name="GridTilesSprite" type="Sprite2D" parent="Gameboard"]
-unique_name_in_owner = true
-
 [node name="GridCellsSprite" type="Sprite2D" parent="Gameboard"]
 unique_name_in_owner = true
 
@@ -29,7 +26,7 @@ unique_name_in_owner = true
 [node name="LaneDividersMesh" type="MeshInstance2D" parent="Gameboard"]
 unique_name_in_owner = true
 
-[node name="Builder" type="Node" parent="Gameboard"]
+[node name="Builder" type="Node2D" parent="Gameboard"]
 unique_name_in_owner = true
 script = ExtResource("3_bbn6i")
 

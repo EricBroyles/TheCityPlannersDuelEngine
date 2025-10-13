@@ -3,8 +3,10 @@ extends Node
 var mouse_position: Vector2
 
 ## Gameboard
-const CELL_WIDTH_PX = 10
-const TILE_WIDTH_CELLS = 3
+const PX_PER_FT: int = 1
+const CELL_WIDTH_FT: int = 4
+const CELL_WIDTH_PX: int = CELL_WIDTH_FT * PX_PER_FT
+const CHUNK_WIDTH_CELLS: int = 256
 
 ## Colors
 var grid_dark_color: Color = Color("#3DD06E")

@@ -1,18 +1,19 @@
-extends Node
+extends Node2D
 class_name GameboardBuilder
 
 @onready var gameboard: Gameboard = %Gameboard
 @onready var body_sprite: Sprite2D = %BodySprite
 @onready var body_mesh_instance: MeshInstance2D = %BodyMeshInstance
 
+var _w: int = EngineData.CELL_WIDTH_PX
 var cell: GameboardCell = GameboardCell.create_empty()
-var matrix: GameboardMatrix = GameboardMatrix.create_empty(1,1)
+var rect_region: Vector2 = Vector2(_w,_w)
 var inputs_per_second: int = 30
 var second_progress: float = 0.0
 var inputs_count: int = 0
 
 func _ready() -> void:
-	body_sprite.centered = true
+	body_sprite.centered = false
 	
 func _process(delta: float) -> void:
 	second_progress += delta
@@ -92,18 +93,17 @@ func _input(_event: InputEvent) -> void:
 		
 func clear() -> void:
 	cell = GameboardCell.create_empty()
-	matrix = GameboardMatrix.create_empty(1,1)
+	rect_region = Vector2(_w,_w)
 	body_sprite.texture = null
 	body_mesh_instance.mesh = ArrayMesh.new()
 	
 func move_builder(req_center_point: Vector2) -> void:
-	var grid_locked_top_left_pos: Vector2 = round((req_center_point - matrix.size_px()/2)/ EngineData.CELL_WIDTH_PX) * EngineData.CELL_WIDTH_PX
-	body_sprite.position = grid_locked_top_left_pos + matrix.size_px()/2
-	body_mesh_instance.position = grid_locked_top_left_pos 
-
+	var grid_locked_top_left_pos: Vector2 = round((req_center_point - rect_region/2)/ EngineData.CELL_WIDTH_PX) * EngineData.CELL_WIDTH_PX
+	self.position = grid_locked_top_left_pos 
+	
 func increment(by: int) -> void:
 	if cell.junction == cell.NONE:
-		matrix.scale_radially(by)
+		scale_rect_region_radially(by)
 	else: cell.increment_junction(by)
 	
 func gameboard_add() -> void:
@@ -113,10 +113,37 @@ func gameboard_remove() -> void:
 	pass
 	
 func draw_builder() -> void:
-	matrix.fill_with(cell)
-	body_mesh_instance.mesh = matrix.get_array_mesh()
+	#matrix.fill_with(cell)
+	body_mesh_instance.mesh = get_rect_region_array_mesh()
 	#body_sprite.texture = matrix.get_image_texture()
+	pass
 	
+
+func scale_rect_region_radially(by: int):
+	rect_region = rect_region + Vector2(2 * by, 2 * by) * _w
+	
+func get_rect_region_array_mesh() -> ArrayMesh:
+	var mesh: ArrayMesh = ArrayMesh.new()
+	var cell_color: Color = cell.get_cell_color()
+	var vertices = PackedVector2Array([
+		Vector2(0, 0),
+		Vector2(rect_region.x, 0),
+		Vector2(rect_region.x, rect_region.y),
+		Vector2(0, rect_region.y)
+	])
+	var colors = PackedColorArray([
+		cell_color, cell_color, cell_color, cell_color
+	])
+	var indices = PackedInt32Array([0, 1, 2, 0, 2, 3])
+	var arrays: Array = []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = vertices
+	arrays[Mesh.ARRAY_COLOR] = colors
+	arrays[Mesh.ARRAY_INDEX] = indices
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	return mesh
+
+
 
 
 

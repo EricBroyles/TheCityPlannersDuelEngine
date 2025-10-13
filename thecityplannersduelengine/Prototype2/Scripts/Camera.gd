@@ -16,6 +16,9 @@ func _ready() -> void:
 	
 func _process(delta: float) -> void:
 	EngineData.mouse_position = get_global_mouse_position()
+	print(position)
+	print(get_viewport_rect().size * zoom)
+	
 	perform_move(delta)
 	perform_zoom()
 	

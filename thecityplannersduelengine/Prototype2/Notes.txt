@@ -1,8 +1,2 @@
 Index: Vector2(c,r)
 Size: vector2(c,r)
-
-
-
-1 ft = 10 px
-cell = 1ft by 1 ft
-tiles = 3 cells by 3 cells, dont really matter
