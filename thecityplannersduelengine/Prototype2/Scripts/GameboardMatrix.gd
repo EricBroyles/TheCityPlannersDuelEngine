@@ -51,7 +51,7 @@ func get_image_texture() -> ImageTexture:
 	var cols = contents[0].size()
 	var img = Image.create(cols * _w, rows * _w, false, Image.FORMAT_RGBA8)
 	for r in rows: for c in cols:
-		var color = (contents[r][c] as GameboardCell).get_cell_color()
+		var color = (contents[r][c] as GameboardCell).get_color()
 		for y in _w: for x in _w:
 				img.set_pixel(c * _w + x, r * _w + y, color)
 	var tex = ImageTexture.create_from_image(img)
@@ -65,7 +65,7 @@ func get_array_mesh() -> ArrayMesh:
 	
 	for r in contents.size(): for c in contents[0].size():
 		var top_left: Vector2 = Vector2(c,r) * _w
-		var cell_color: Color = (contents[r][c] as GameboardCell).get_cell_color()
+		var cell_color: Color = (contents[r][c] as GameboardCell).get_color()
 		var base = verts.size() 
 		
 		var v0: Vector2 = top_left
