@@ -6,6 +6,8 @@ var mouse_position: Vector2
 #c,r: position in px converted to col/row as float
 #size c,r: number of cells across and tall
 var view_box: Vector4 
+const MIN_VIEW_BOX_WIDTH: int = int(CHUNK_WIDTH_CELLS / 4.0)
+const MAX_VIEW_BOX_WIDTH: int = CHUNK_WIDTH_CELLS * 4
 
 ## Gameboard
 const PX_PER_FT: int = 1

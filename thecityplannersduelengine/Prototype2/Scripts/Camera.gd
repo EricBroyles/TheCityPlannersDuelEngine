@@ -1,59 +1,61 @@
 extends Camera2D
 
-var move_speed: float = 500 #px/sec
-var zoom_speed: float = .025*2 
-var start_zoom: float = .5
-var zoom_out_limit: float = .02
-var zoom_in_limit: float = 5
-
-var movement_dirvec: Vector2 = Vector2.ZERO
-var req_movement: Vector2 = Vector2.ZERO
-var zoom_change: Vector2 = Vector2.ZERO
-var req_zoom: Vector2 = Vector2.ZERO
+var move_speed: float = 500 #px/s
+var zoom_speed: float = .05
+var start_zoom: float = 1
+var time_delta: float = 0
 
 func _ready() -> void:
-	zoom = Vector2(start_zoom, start_zoom)
-	
+	zoom = Vector2.ONE * start_zoom
+
 func _process(delta: float) -> void:
+	time_delta = delta
 	EngineData.mouse_position = get_global_mouse_position()
 	EngineData.view_box = get_camera_view_box()
 	print(EngineData.view_box)
-	perform_move(delta)
-	perform_zoom()
+	handle_move()
+	handle_zoom()
 	
 func get_camera_view_box() -> Vector4:
 	var c: float = position.x / EngineData.CELL_WIDTH_PX
 	var r: float = position.y / EngineData.CELL_WIDTH_PX
-	var size_c: float = get_viewport_rect().size.x / zoom.x / EngineData.CELL_WIDTH_PX
-	var size_r: float = get_viewport_rect().size.y / zoom.x / EngineData.CELL_WIDTH_PX
-	return Vector4(c,r,size_c,size_r)
+	var view_size: Vector2 = get_camera_view_size(zoom)
+	return Vector4(c, r, view_size.x, view_size.y)
 	
-	
-	
-func perform_move(delta: float):
-	movement_dirvec = Vector2.ZERO 
+func get_camera_view_size(at_zoom: Vector2) -> Vector2:
+	return get_viewport_rect().size / at_zoom.x / EngineData.CELL_WIDTH_PX
+		
+func handle_move() -> void:
+	var dir: Vector2 = Vector2.ZERO
 	if Input.is_action_pressed("move camera north"):
-		movement_dirvec.y -= 1
+		dir = Vector2(0, -1)
 	if Input.is_action_pressed("move camera south"):
-		movement_dirvec.y += 1
+		dir = Vector2(0, +1)
 	if Input.is_action_pressed("move camera west"):
-		movement_dirvec.x -= 1
+		dir = Vector2(-1, 0)
 	if Input.is_action_pressed("move camera east"):
-		movement_dirvec.x += 1
-	req_movement = movement_dirvec.normalized() * move_speed * delta * 1/zoom 
-	position += req_movement
+		dir = Vector2(+1, 0)
+	position += dir.normalized() * move_speed * time_delta * 1/zoom 
 	
-func perform_zoom() -> void:
-	zoom_change = Vector2.ZERO
+func handle_zoom() -> void:
+	var dir: int = 0
 	if Input.is_action_just_released("zoom camera in"):
-		zoom_change = Vector2.ONE * zoom_speed 
+		dir = +1
 	if Input.is_action_just_released("zoom camera out"):
-		zoom_change = Vector2.ONE * -zoom_speed 
-	if zoom_change != Vector2.ZERO:
-		zoom_change += zoom
-		zoom = Vector2(clamp(zoom_change.x, zoom_out_limit, zoom_in_limit), 
-					   clamp(zoom_change.y, zoom_out_limit, zoom_in_limit))
-					
-
+		dir = -1
+	if dir == 0: return
 	
+	#find the max zoom (NOTE how max_zoom is different in x and y, we need the smallest for max)
+	var max_zoom_vec: Vector2 = get_viewport_rect().size / EngineData.MAX_VIEW_BOX_WIDTH / EngineData.CELL_WIDTH_PX
+	var max_zoom: float = min(max_zoom_vec.x, max_zoom_vec.y)
 	
+	#find the min zoom
+	var min_zoom_vec: Vector2 = get_viewport_rect().size / EngineData.MIN_VIEW_BOX_WIDTH / EngineData.CELL_WIDTH_PX
+	var min_zoom: float = max(min_zoom_vec.x, min_zoom_vec.y)
+	
+	var new_zoom: float = zoom.x + dir * zoom_speed
+	if new_zoom < max_zoom:
+		new_zoom = max_zoom
+	elif new_zoom > min_zoom:
+		new_zoom = min_zoom
+	zoom = Vector2.ONE * new_zoom
