@@ -17,7 +17,7 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if not cell.is_empty():
-		move_builder(EngineData.mouse_position)
+		move_builder(EngineData.mouse_cell_position)
 		
 func _input(_event: InputEvent) -> void:
 	

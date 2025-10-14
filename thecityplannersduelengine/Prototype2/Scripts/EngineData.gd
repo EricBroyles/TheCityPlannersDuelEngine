@@ -1,21 +1,18 @@
 extends Node
 
 ## Camera
-var mouse_position: Vector2
-
-#c,r: position in px converted to col/row as float
-#size c,r: number of cells across and tall
-var view_box: Vector4 
-const MIN_VIEW_BOX_WIDTH: int = int(CHUNK_WIDTH_CELLS / 4.0)
-const MAX_VIEW_BOX_WIDTH: int = CHUNK_WIDTH_CELLS * 4
+var mouse_cell_position: Vector2 #(c,r)
+var cells_view_rect: Rect2 #(top_left_c, top_left_r, size_c, size_r)
+const MIN_VIEW_BOX_WIDTH: int = 50
+const MAX_VIEW_BOX_WIDTH: int = 1000
 
 ## Gameboard
 const PX_PER_FT: int = 1
 const CELL_WIDTH_FT: int = 4
 const CELL_WIDTH_PX: int = CELL_WIDTH_FT * PX_PER_FT
-const CHUNK_WIDTH_CELLS: int = 256
 
 ## Colors
+var void_color: Color = Color.BEIGE
 var grid_dark_color: Color = Color("#3DD06E")
 var grid_light_color: Color = Color("#4EF887")
 var road_color: Color = Color("#78A2CE")

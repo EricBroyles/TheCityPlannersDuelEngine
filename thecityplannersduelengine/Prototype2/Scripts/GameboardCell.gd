@@ -1,13 +1,13 @@
 class_name GameboardCell
-
+enum GROUND {DARK, LIGHT}
 enum {
-	LIGHT_GROUND, DARK_GROUND,
 	ROAD, WALKWAY, BUILDING, PARKING, BARRIER, #Terrains
 	STOP_JUNCTION, LVL1_JUNCTION, LVL2_JUNCTION, LVL3_JUNCTION, #junction
 	LANE_DIVIDER, 
 	MAX
 }
 
+var ground: int
 var contents: Array[bool] = get_empty_contents() #the order matters. it depends on enum int value as the index
 var velocity: Velocity = Velocity.create_empty()
 
@@ -60,7 +60,6 @@ static func string_to_velocity(s: String) -> Velocity:
 				v.speed_mph = float(speed_str)
 			if dir_str != "":
 				v.set_direction_degrees_from_cardinal(dir_str)
-	print(v)
 	return v
 
 func is_empty() -> bool:
@@ -85,14 +84,14 @@ func is_junction() -> bool:
 	
 func get_color() -> Color:
 	var c: Color = Color("#000000", 0)
+	if ground == GROUND.LIGHT: c = c.blend(EngineData.grid_light_color)
+	else: c = c.blend(EngineData.grid_dark_color)
 	for i in MAX:
 		if contents[i]: c = c.blend(_color_map(i))
 	return c
 		
 func _color_map(i: int) -> Color:
 	match i:
-		LIGHT_GROUND: return EngineData.grid_light_color
-		DARK_GROUND: return EngineData.grid_dark_color
 		ROAD: return EngineData.road_color
 		WALKWAY: return EngineData.walkway_color
 		PARKING: return EngineData.parking_color
