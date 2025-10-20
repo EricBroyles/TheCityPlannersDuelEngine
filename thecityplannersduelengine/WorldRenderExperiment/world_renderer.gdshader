@@ -1,4 +1,5 @@
 shader_type canvas_item;
+render_mode unshaded;
 
 uniform sampler2DArray tex_array;
 uniform int start_idx;
@@ -12,7 +13,7 @@ void vertex() {
 
 
 void fragment() {
-    vec2 pixel_pos = FRAGCOORD.xy - position_offset; // position in pixels, relative to offset
+    vec2 pixel_pos = FRAGCOORD.xy; // position in pixels, relative to offset
     vec2 tex_pos = floor(pixel_pos / px_per_cell);   // which texel we’re inside
     vec2 local_uv = fract(pixel_pos / px_per_cell);  // position inside the texel (0–1)
 

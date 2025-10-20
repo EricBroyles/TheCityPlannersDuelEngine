@@ -38,13 +38,13 @@ func get_camera_view_size(at_zoom: float) -> Vector2:
 func update_continous_position() -> void:
 	var dir: Vector2 = Vector2.ZERO
 	if Input.is_action_pressed("move camera north"):
-		dir = Vector2(0, -1)
+		dir += Vector2(0, -1)
 	if Input.is_action_pressed("move camera south"):
-		dir = Vector2(0, +1)
+		dir += Vector2(0, +1)
 	if Input.is_action_pressed("move camera west"):
-		dir = Vector2(-1, 0)
+		dir += Vector2(-1, 0)
 	if Input.is_action_pressed("move camera east"):
-		dir = Vector2(+1, 0)
+		dir += Vector2(+1, 0)
 	continous_position += dir.normalized() * move_speed * time_delta * 1/zoom 
 	
 func update_continous_zoom() -> void:

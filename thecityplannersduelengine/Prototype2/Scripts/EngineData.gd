@@ -3,8 +3,10 @@ extends Node
 ## Camera
 var mouse_cell_position: Vector2 #(c,r)
 var cells_view_rect: Rect2 #(top_left_c, top_left_r, size_c, size_r)
-const MIN_VIEW_BOX_WIDTH: int = 50
-const MAX_VIEW_BOX_WIDTH: int = 1000
+
+
+const MIN_VIEW_BOX_WIDTH: int = 50 #cells
+const MAX_VIEW_BOX_WIDTH: int = 1000 #cells
 
 ## Gameboard
 const PX_PER_FT: int = 1
