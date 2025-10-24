@@ -13,18 +13,28 @@ extends Node2D
 #	copy the empty Screen !Data! Image and fill it with data using blit.rect() from World Image
 # 	update the Data Texture (in theory it will take the data texture and see that the sprite is around 4x larger and draw everything appropriatly)
 
+
+# zoom changes the PX_PER_CELL
+# zoom position correction: get the center of the old zoom, get the center of the new zoom, shift the top left position by the delta
+
+
 @onready var ViewSprite: Sprite2D = %ViewSprite
 @onready var Visualizer: Sprite2D = %Visualizer
 
 var time_delta: float
 var move_speed: float = 500.0
+var zoom_speed: float = 1.0 #increment px_per_cell
 
-const PX_PER_CELL: int = 40
-var WORLD_CELL_ROWS: int = 4000
-var WORLD_CELL_COLS: int = 4000
-var screen_size: Vector2 #assumed to not change for this example
+const WORLD_CELL_ROWS: int = 4000
+const WORLD_CELL_COLS: int = 4000
+const ZIN_PX_PER_CELL: int = 12*4
+const Z1_PX_PER_CELL: int = 12
+const ZOUT_PX_PER_CELL: int = 12/4.0
+
+var px_per_cell: int = Z1_PX_PER_CELL
+var screen_size: Vector2 
 var screen_cell_size: Vector2i 
-var screen_position: Vector2
+var screen_position: Vector2 
 var screen_cell_index: Vector2i
 
 var world_data_img : Image
@@ -36,7 +46,9 @@ var screen_view_tex: ImageTexture
 
 func _ready() -> void:
 	screen_size = get_viewport_rect().size
-	screen_cell_size = ceil(screen_size / PX_PER_CELL)
+	screen_cell_size = ceil(screen_size / px_per_cell)
+	screen_position = Vector2(0,0)
+	screen_cell_index = Vector2i(0,0)
 	
 	world_data_img = create_random_image(WORLD_CELL_COLS, WORLD_CELL_ROWS)
 	world_data_tex = ImageTexture.create_from_image(world_data_img)
@@ -56,24 +68,22 @@ func _ready() -> void:
 	ViewSprite.material = mat
 	ViewSprite.centered = false
 	
-	
-	#var copy_at_rect: Rect2i = Rect2i(Vector2i(0,0), screen_cell_size)
-	#var paste_at_idx: Vector2i = Vector2i(0,0)
-	#screen_data_img.blit_rect(world_data_img, copy_at_rect, paste_at_idx)
-	#screen_data_tex.update(screen_data_img)
-	#Visualizer.texture = screen_data_tex
-	#Visualizer.centered = false
-	#Visualizer.scale = Vector2(40,40)
-	
+	handle_screen()
+
 func _process(delta: float) -> void:
 	time_delta = delta
 	var m: bool = handle_move()
-	
+	#var z: bool = handle_zoom()
+	#if m or z:
+		#handle_screen()
 	if m:
-		var copy_at_rect: Rect2i = Rect2i(screen_cell_index, screen_cell_size)
-		var paste_at_idx: Vector2i = Vector2i(0,0)
-		screen_data_img.blit_rect(world_data_img, copy_at_rect, paste_at_idx)
-		screen_data_tex.update(screen_data_img)
+		handle_screen()
+
+func handle_screen() -> void:
+	var copy_at_rect: Rect2i = Rect2i(screen_cell_index, screen_cell_size)
+	var paste_at_idx: Vector2i = Vector2i(0,0)
+	screen_data_img.blit_rect(world_data_img, copy_at_rect, paste_at_idx)
+	screen_data_tex.update(screen_data_img)
 		
 func handle_move() -> bool:
 	var dir: Vector2 = Vector2.ZERO
@@ -87,10 +97,42 @@ func handle_move() -> bool:
 		dir += Vector2(+1, 0)
 	if dir == Vector2.ZERO: return false
 	screen_position += dir.normalized() * move_speed * time_delta #* 1/zoom_scale
-	screen_position.x = clamp(screen_position.x, 0, WORLD_CELL_COLS * PX_PER_CELL - screen_size.x)
-	screen_position.y = clamp(screen_position.y, 0, WORLD_CELL_ROWS * PX_PER_CELL - screen_size.y)
-	screen_cell_index = screen_position / PX_PER_CELL
+	screen_position.x = clamp(screen_position.x, 0, WORLD_CELL_COLS * px_per_cell - screen_size.x)
+	screen_position.y = clamp(screen_position.y, 0, WORLD_CELL_ROWS * px_per_cell - screen_size.y)
+	screen_cell_index = screen_position / px_per_cell
 	return true
+	
+#func handle_zoom() -> bool:
+	#var dir: int = 0
+	#var old_px_per_cell: int = px_per_cell
+	#if Input.is_action_just_released("zoom camera in"):
+		#dir = +1
+	#if Input.is_action_just_released("zoom camera out"):
+		#dir = -1
+	#if dir == 0: return false
+	#px_per_cell = clamp(px_per_cell + dir*zoom_speed, ZOUT_PX_PER_CELL, ZIN_PX_PER_CELL)
+	#if old_px_per_cell == px_per_cell: return false
+	##shift the screen_position to keep screen center in the same place
+	#
+	##find the old screen center
+	##find the new screen center
+	##shift the screen center so it is on the old screen center
+	##apply the delta to shift the screen_position
+	##clamp the screen position
+	#
+	##ultimalty I need to update screen_cell_index, screen_cell_size!!!!
+	#
+	#var old_screen_center_cell: Vector2i = screen_cell_index + screen_cell_size
+	#var old_screen_center: Vector2 = old_screen_center_cell * old_px_per_cell
+	#screen_cell_size = screen_size / px_per_cell #new screen cell size
+	#var new_screen_center_cell: Vector2i = screen_cell_index + screen_cell_size
+	#var new_screen_center: Vector2 = new_screen_center_cell * px_per_cell
+	#var shift: Vector2 = old_screen_center - new_screen_center
+	#screen_position += shift
+	#screen_position.x = clamp(screen_position.x, 0, WORLD_CELL_COLS * px_per_cell - screen_size.x)
+	#screen_position.y = clamp(screen_position.y, 0, WORLD_CELL_ROWS * px_per_cell - screen_size.y)
+	#screen_cell_index = screen_position / px_per_cell
+	#return true
 	
 func create_random_image(w: int, h: int) -> Image:
 	var start_time = Time.get_ticks_msec()  # Start timer

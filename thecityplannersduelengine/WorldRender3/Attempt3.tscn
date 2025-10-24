@@ -1,13 +1,31 @@
-[gd_scene load_steps=2 format=3 uid="uid://dw0qvq5k2snfh"]
+[gd_scene load_steps=5 format=3 uid="uid://dw0qvq5k2snfh"]
 
-[ext_resource type="Script" uid="uid://cinegcdogtj02" path="res://WorldRender3/attempt3.gd" id="1_40ryn"]
+[ext_resource type="Script" uid="uid://qbdj70w4ryxv" path="res://WorldRender3/attempt4.gd" id="1_40ryn"]
+[ext_resource type="Shader" uid="uid://dq3rjbbw8jjp6" path="res://WorldRender3/attempt3.gdshader" id="2_b8vmj"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6r15k"]
+shader = ExtResource("2_b8vmj")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b8vmj"]
 
 [node name="Attempt3" type="Node2D"]
 script = ExtResource("1_40ryn")
 
 [node name="ViewSprite" type="Sprite2D" parent="."]
 unique_name_in_owner = true
+material = SubResource("ShaderMaterial_6r15k")
 
-[node name="Visualizer" type="Sprite2D" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MouseCellIdx" type="RichTextLabel" parent="CanvasLayer"]
 unique_name_in_owner = true
-visible = false
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_b8vmj")
+text = "C: 0000 --- R: 0000"
+horizontal_alignment = 1
+vertical_alignment = 1

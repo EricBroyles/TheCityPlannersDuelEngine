@@ -35,7 +35,6 @@ text = "Ro Wa"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-placeholder_text = "Pain"
 caret_blink = true
 
 [node name="Gameboard" type="Node2D" parent="."]
