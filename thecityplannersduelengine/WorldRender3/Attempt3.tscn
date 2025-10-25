@@ -1,10 +1,20 @@
-[gd_scene load_steps=5 format=3 uid="uid://dw0qvq5k2snfh"]
+[gd_scene load_steps=8 format=3 uid="uid://dw0qvq5k2snfh"]
 
 [ext_resource type="Script" uid="uid://qbdj70w4ryxv" path="res://WorldRender3/attempt4.gd" id="1_40ryn"]
 [ext_resource type="Shader" uid="uid://dq3rjbbw8jjp6" path="res://WorldRender3/attempt3.gdshader" id="2_b8vmj"]
+[ext_resource type="Shader" uid="uid://bcn2cpn48xnhw" path="res://WorldRender3/ground.gdshader" id="3_6r15k"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_6r15k"]
 shader = ExtResource("2_b8vmj")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hbbkh"]
+shader = ExtResource("3_6r15k")
+shader_parameter/scale = 0.005
+shader_parameter/rock_threshold = 0.65
+shader_parameter/height_variation = 0.4
+shader_parameter/offset = Vector2(0, 0)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_6r15k"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b8vmj"]
 
@@ -14,6 +24,13 @@ script = ExtResource("1_40ryn")
 [node name="ViewSprite" type="Sprite2D" parent="."]
 unique_name_in_owner = true
 material = SubResource("ShaderMaterial_6r15k")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_hbbkh")
+position = Vector2(8, -4)
+scale = Vector2(1719.25, 976.25)
+texture = SubResource("CompressedTexture2D_6r15k")
+centered = false
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

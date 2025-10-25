@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://bd3kydsexomn1"]
+
+[ext_resource type="Script" uid="uid://pldl646m0k85" path="res://_SimpleWorldRenderer/Main.gd" id="1_ax88a"]
+[ext_resource type="Script" uid="uid://chu3lsehvcxim" path="res://_SimpleWorldRenderer/camera.gd" id="2_orkmm"]
+[ext_resource type="Texture2D" uid="uid://c1v5fsa5l20ad" path="res://_SimpleWorldRenderer/Component 3487.svg" id="3_4v33v"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_ax88a")
+
+[node name="Camera" type="Camera2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_orkmm")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("3_4v33v")
+centered = false
+offset = Vector2(-128, -128)
+
+[node name="World" type="Node2D" parent="."]
+unique_name_in_owner = true

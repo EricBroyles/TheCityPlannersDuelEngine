@@ -1,0 +1,77 @@
+[gd_scene load_steps=8 format=3 uid="uid://cdtulivd2quhs"]
+
+[ext_resource type="Script" uid="uid://ce2coqredeaj7" path="res://Prototype3/Scripts/UserCommands.gd" id="1_pudmo"]
+[ext_resource type="Script" uid="uid://sbjpad5n801t" path="res://Prototype3/Scripts/Gameboard.gd" id="2_04sl5"]
+[ext_resource type="Script" uid="uid://cxtem4hy6fpl5" path="res://Prototype3/Scripts/GameboardBuilder.gd" id="2_in2a6"]
+[ext_resource type="Shader" uid="uid://b2mrrfnvp5uxy" path="res://Prototype3/Shaders/Grid.gdshader" id="2_ljukr"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qm1t3"]
+bg_color = Color(0.144063, 0.144063, 0.144062, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pudmo"]
+bg_color = Color(0.145098, 0.145098, 0.145098, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_04sl5"]
+shader = ExtResource("2_ljukr")
+
+[node name="Main" type="Node2D"]
+
+[node name="UserCommands" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("1_pudmo")
+
+[node name="UserInterface" type="CanvasLayer" parent="."]
+
+[node name="TopTextData" type="RichTextLabel" parent="UserInterface"]
+unique_name_in_owner = true
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -263.0
+offset_right = 263.0
+offset_bottom = 23.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_qm1t3")
+text = "C: 0000 --- R: 0000"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UserInterface"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -75.0
+offset_right = 457.0
+grow_vertical = 0
+
+[node name="InputTips" type="RichTextLabel" parent="UserInterface/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_pudmo")
+text = "ro wa bu pa ba la js j1 j2 j3 ve000NE"
+vertical_alignment = 1
+
+[node name="CommandLine" type="LineEdit" parent="UserInterface/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+draw_control_chars = true
+caret_blink = true
+
+[node name="Gameboard" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_04sl5")
+
+[node name="ViewSprite" type="Sprite2D" parent="Gameboard"]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_04sl5")
+
+[node name="Builder" type="Node2D" parent="Gameboard"]
+unique_name_in_owner = true
+script = ExtResource("2_in2a6")
+
+[node name="MeshInstance" type="MeshInstance2D" parent="Gameboard/Builder"]
+unique_name_in_owner = true

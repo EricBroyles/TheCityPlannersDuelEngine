@@ -1,9 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://dm23qeb7xapp0"]
-
-[ext_resource type="Script" uid="uid://7cmi7lheii71" path="res://FunWithShaders/ShaderSprite.gd" id="1_3jp2g"]
-
-[node name="Main" type="Node2D"]
-
-[node name="ShaderSprite" type="Sprite2D" parent="."]
-centered = false
-script = ExtResource("1_3jp2g")

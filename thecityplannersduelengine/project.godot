@@ -15,7 +15,7 @@ config/features=PackedStringArray("4.4", "Mobile")
 
 [autoload]
 
-EngineData="*res://Prototype2/Scripts/EngineData.gd"
+GameData="*res://Prototype3/Scripts/GameData.gd"
 
 [input]
 

@@ -1,0 +1,13 @@
+Gameboard Coordinate System: (0,0) -> size of gameboard
+* position and px size varies with px_per_cell
+* constant with cells
+
+Screen Coordinate System: (0,0) to screen size
+* constant px size
+* variable number of cells visible
+
+When ever possible work in Gameboard Coordinate system
+* cell_idx
+
+When specifing positon
+* specify screen position
