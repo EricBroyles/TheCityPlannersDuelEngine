@@ -13,10 +13,15 @@ bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pbw6q"]
 shader = ExtResource("3_rgh2o")
-shader_parameter/color1 = Vector4(0.1, 0.6, 0.2, 1)
-shader_parameter/color2 = Vector4(0.05, 0.3, 0.1, 1)
+shader_parameter/world_cell_size = Vector2i(0, 0)
 shader_parameter/px_per_cell = 32.0
 shader_parameter/px_position = Vector2(0, 0)
+shader_parameter/color1 = Vector4(0.3, 0.6, 0.2, 1)
+shader_parameter/color2 = Vector4(0.45, 0.33, 0.2, 1)
+shader_parameter/color3 = Vector4(0.5, 0.5, 0.5, 1)
+shader_parameter/edge_fade_cells = 10
+shader_parameter/noise_scale = 0.15
+shader_parameter/noise_threshold = 0.5
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_rgh2o"]
 
@@ -45,10 +50,15 @@ shader_parameter/width = 0.05
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rgh2o"]
 shader = ExtResource("3_rgh2o")
-shader_parameter/color1 = Vector4(0.1, 0.6, 0.2, 1)
-shader_parameter/color2 = Vector4(0.05, 0.3, 0.1, 1)
+shader_parameter/world_cell_size = Vector2i(0, 0)
 shader_parameter/px_per_cell = 32.0
 shader_parameter/px_position = Vector2(0, 0)
+shader_parameter/color1 = Vector4(0.3, 0.6, 0.2, 1)
+shader_parameter/color2 = Vector4(0.45, 0.33, 0.2, 1)
+shader_parameter/color3 = Vector4(0.5, 0.5, 0.5, 1)
+shader_parameter/edge_fade_cells = 10
+shader_parameter/noise_scale = 0.15
+shader_parameter/noise_threshold = 0.5
 
 [node name="Main" type="Node2D"]
 

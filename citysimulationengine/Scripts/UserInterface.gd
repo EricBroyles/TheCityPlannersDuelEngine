@@ -32,7 +32,7 @@ extends CanvasLayer
 
 var dark_transparent_color: Color = Color(0,0,0,.5)
 var time_delta: float
-var move_speed: float = 1000.0
+var move_speed: float = 2000.0
 var zoom_speed: float = 1.0
 
 func _ready() -> void:

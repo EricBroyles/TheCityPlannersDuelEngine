@@ -26,6 +26,8 @@ var world_velocity_img: Image = Image.create(CELL_COLS, CELL_ROWS, false, Image.
 var world_velocity_tex: ImageTexture = ImageTexture.create_from_image(world_velocity_img)
 
 func _ready() -> void:
+	background.material.set_shader_parameter("world_cell_size", Vector2i(CELL_COLS, CELL_ROWS))
+	
 	world_terrain_img = create_gradient_random_image(CELL_COLS, CELL_ROWS)
 	#world_terrain_img.fill(TerrainColor.EMPTY_COLOR)
 	world_terrain_tex = ImageTexture.create_from_image(world_terrain_img)
@@ -66,10 +68,12 @@ func get_screen_cell_size() -> Vector2i:
 	
 func get_cell_idx(px_pos: Vector2i = px_position) -> Vector2i:
 	return px_pos / px_per_cell
+	
+func get_mouse_px_position() -> Vector2i:
+	return Vector2i(get_viewport().get_mouse_position()) + px_position
 
-#func get_mouse_cell_idx() -> Vector2i:
-	#var mouse_position: Vector2 = get_global_mouse_position()
-	#return calc_screen_cell_idx(screen_position_on_gb + mouse_position)
+func get_mouse_cell_idx() -> Vector2i:
+	return get_cell_idx(get_mouse_px_position())
 	
 func draw_terrain(color: Color, world_rect: Rect2i) -> void:
 	_draw_to_img(world_terrain_img, world_terrain_tex, color, world_rect)
