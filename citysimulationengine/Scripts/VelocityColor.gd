@@ -2,12 +2,25 @@ class_name VelocityColor
 
 # r: speed -> (0 to 1000) / 1000
 # g: direction -> (0 to 360) / 360
-# b: is_empty -> 0 or 1
+# b: is_full -> 0 or 1
 # a: NONE
 
+const IMAGE_FORMAT: int = Image.FORMAT_RGBH # r,g,b with 16 bits
 const EMPTY_COLOR: Color = Color(0,0,0,0)
-const MAX_SPEED_MPH: int = 1000
+const MAX_SPEED_MPH: int = 250
+const MAX_DIR_DEG: int  = 315
 const MIN_SPEED_MPU: int = 0
+
+var cardinal_table: Dictionary = {
+	"e" : 0,
+	"ne": 45,
+	"n" : 90,
+	"nw": 135,
+	"w" : 180,
+	"sw": 225,
+	"s" : 270,
+	"se": 315,
+}
 
 var color: Color = EMPTY_COLOR
 
@@ -18,6 +31,7 @@ static func create(speed_mph: int, dir: String) -> VelocityColor:
 	var vel: VelocityColor = VelocityColor.new()
 	vel.set_speed(speed_mph)
 	vel.set_direction(dir)
+	vel.set_full()
 	return vel
 
 func set_speed(mph: int) -> void:
@@ -26,23 +40,24 @@ func set_speed(mph: int) -> void:
 
 func set_direction(dir: String) -> void:
 	var direction_degrees: int
-	match dir.to_lower():
-		"e" : direction_degrees = 0
-		"ne": direction_degrees = 45
-		"n" :  direction_degrees = 90
-		"nw": direction_degrees = 135
-		"w" :  direction_degrees = 180
-		"sw": direction_degrees = 225
-		"s" :  direction_degrees = 270
-		"se": direction_degrees = 315
-		_: 
-			direction_degrees = 0
-			push_error("Failed to provide a carinal direction")
-	color.g = direction_degrees / 360.0
-	
+	direction_degrees = cardinal_table[dir.to_lower()]
+	color.g = direction_degrees / float(MAX_DIR_DEG)
+
+func set_full() -> void:
+	color.b = 1
+
 func is_empty() -> bool:
 	if color.b == 0: return true
 	return false
+	
+static func decode(c: Color) -> void:
+	var speed: int = int(round(c.r * MAX_SPEED_MPH))
+	var dir_deg: int = int(round(c.g * MAX_DIR_DEG))
+	var is_full: int = int(c.b)
+	
+	print(speed, " ", dir_deg, " ", is_full)
+	
+	
 	
 
 

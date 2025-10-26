@@ -1,5 +1,5 @@
 class_name TerrainColor
-
+const IMAGE_FORMAT: int = Image.FORMAT_RGBA8 # r,g,b,a with 8 bits
 const EMPTY_COLOR: Color = Color(0,0,0,0)
 
 var grid_dark_color: Color = Color("#3DD06E")

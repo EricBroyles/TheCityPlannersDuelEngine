@@ -20,23 +20,23 @@ var px_per_cell: int = Z1_PX_PER_CELL
 var px_position: Vector2i = Vector2i(0,0) #top left px position
 
 ## World: each px represents a cell for the entire world
-var world_terrain_img: Image = Image.create(CELL_COLS, CELL_ROWS, false, Image.FORMAT_RGBA8)
+var world_terrain_img: Image = Image.create_empty(CELL_COLS, CELL_ROWS, false, TerrainColor.IMAGE_FORMAT)
 var world_terrain_tex: ImageTexture = ImageTexture.create_from_image(world_terrain_img)
-var world_velocity_img: Image = Image.create(CELL_COLS, CELL_ROWS, false, Image.FORMAT_RGBA8)
+var world_velocity_img: Image = Image.create_empty(CELL_COLS, CELL_ROWS, false, VelocityColor.IMAGE_FORMAT)
 var world_velocity_tex: ImageTexture = ImageTexture.create_from_image(world_velocity_img)
 
 func _ready() -> void:
-	background.material.set_shader_parameter("world_cell_size", Vector2i(CELL_COLS, CELL_ROWS))
+	world_terrain_img.fill(TerrainColor.EMPTY_COLOR)
+	world_terrain_tex.update(world_terrain_img)
 	
-	world_terrain_img = create_gradient_random_image(CELL_COLS, CELL_ROWS)
-	#world_terrain_img.fill(TerrainColor.EMPTY_COLOR)
-	world_terrain_tex = ImageTexture.create_from_image(world_terrain_img)
+	world_velocity_img.fill(VelocityColor.EMPTY_COLOR)
+	world_velocity_tex.update(world_velocity_img)
+	
+	background.material.set_shader_parameter("world_cell_size", Vector2i(CELL_COLS, CELL_ROWS))
 	terrain.material.set_shader_parameter("world_data_tex", world_terrain_tex)
 	
-	world_velocity_img = Image.create_empty(CELL_COLS, CELL_ROWS, false, Image.Format.FORMAT_RGBA8)
-	world_velocity_img.fill(VelocityColor.EMPTY_COLOR)
-	world_velocity_tex = ImageTexture.create_from_image(world_velocity_img)
-	
+	world_velocity_img.set_pixel(0,0,VelocityColor.create(2,"se").color)
+	VelocityColor.decode(world_velocity_img.get_pixel(0,0))
 	update_view()
 
 func update_view() -> void:
