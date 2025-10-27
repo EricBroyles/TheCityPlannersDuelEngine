@@ -5,11 +5,11 @@ class_name VelocityColor
 # b: is_full -> 0 or 1
 # a: NONE
 
-const IMAGE_FORMAT: int = Image.FORMAT_RGBH # r,g,b with 16 bits
+const IMAGE_FORMAT := Image.FORMAT_RGBH # r,g,b with 16 bits
 const EMPTY_COLOR: Color = Color(0,0,0,0)
 const MAX_SPEED_MPH: int = 250
+const MIN_SPEED_MPH: int = 0
 const MAX_DIR_DEG: int  = 315
-const MIN_SPEED_MPU: int = 0
 
 var cardinal_table: Dictionary = {
 	"e" : 0,
@@ -35,7 +35,7 @@ static func create(speed_mph: int, dir: String) -> VelocityColor:
 	return vel
 
 func set_speed(mph: int) -> void:
-	var formated_speed: float = clamp(mph, MIN_SPEED_MPU, MAX_SPEED_MPH) / float(MAX_SPEED_MPH)
+	var formated_speed: float = clamp(mph, MIN_SPEED_MPH, MAX_SPEED_MPH) / float(MAX_SPEED_MPH)
 	color.r = formated_speed
 
 func set_direction(dir: String) -> void:

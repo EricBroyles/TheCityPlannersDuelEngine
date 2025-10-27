@@ -17,7 +17,7 @@ const Z1_PX_PER_CELL: int = 12
 const ZOUT_PX_PER_CELL: int = int(12/4.0)
 
 var px_per_cell: int = Z1_PX_PER_CELL
-var px_position: Vector2i = Vector2i(0,0) #top left px position
+var px: Vector2i = Vector2i(0,0) #top left px position
 
 ## World: each px represents a cell for the entire world
 var world_terrain_img: Image = Image.create_empty(CELL_COLS, CELL_ROWS, false, TerrainColor.IMAGE_FORMAT)
@@ -26,7 +26,9 @@ var world_velocity_img: Image = Image.create_empty(CELL_COLS, CELL_ROWS, false, 
 var world_velocity_tex: ImageTexture = ImageTexture.create_from_image(world_velocity_img)
 
 func _ready() -> void:
+	
 	world_terrain_img.fill(TerrainColor.EMPTY_COLOR)
+	#world_terrain_img = create_gradient_random_image(CELL_COLS, CELL_ROWS) ## REMOVE
 	world_terrain_tex.update(world_terrain_img)
 	
 	world_velocity_img.fill(VelocityColor.EMPTY_COLOR)
@@ -35,21 +37,29 @@ func _ready() -> void:
 	background.material.set_shader_parameter("world_cell_size", Vector2i(CELL_COLS, CELL_ROWS))
 	terrain.material.set_shader_parameter("world_data_tex", world_terrain_tex)
 	
-	world_velocity_img.set_pixel(0,0,VelocityColor.create(2,"se").color)
-	VelocityColor.decode(world_velocity_img.get_pixel(0,0))
 	update_view()
+	
+func _process(_delta: float) -> void:
+	GameData.world_px_per_cell = px_per_cell
+	GameData.world_px = px
+	GameData.mouse_screen_float_px = get_mouse_screen_float_px()
+	GameData.mouse_screen_px = get_mouse_screen_px()
+	GameData.mouse_world_px = screen_px_to_px(GameData.mouse_screen_px)
+	GameData.mouse_cell_idx = get_cell_idx(GameData.mouse_world_px)
+	GameData.screen_px_size = get_screen_size()
+	GameData.screen_cell_size = get_screen_cell_size()
 
 func update_view() -> void:
 	background.material.set_shader_parameter("px_per_cell", px_per_cell)
-	background.material.set_shader_parameter("px_position", px_position)
+	background.material.set_shader_parameter("px_position", px)
 	terrain.material.set_shader_parameter("px_per_cell", px_per_cell)
-	terrain.material.set_shader_parameter("px_position", px_position)
+	terrain.material.set_shader_parameter("px_position", px)
 	
 func move_view(by_px: Vector2i) -> void:
-	px_position += by_px
+	px += by_px
 	var max_px_pos: Vector2i = Vector2i.ONE * CELL_COLS * px_per_cell - get_screen_size()
-	px_position.x = clamp(px_position.x, 0, max_px_pos.x)
-	px_position.y = clamp(px_position.y, 0, max_px_pos.y)
+	px.x = clamp(px.x, 0, max_px_pos.x)
+	px.y = clamp(px.y, 0, max_px_pos.y)
 	update_view()
 	
 func zoom_view(by: int) -> void:
@@ -66,30 +76,35 @@ func get_screen_size() -> Vector2i:
 func get_screen_cell_size() -> Vector2i:
 	return ceil(get_screen_size() / px_per_cell)
 	
-func get_cell_idx(px_pos: Vector2i = px_position) -> Vector2i:
-	return px_pos / px_per_cell
+func get_cell_idx(world_px: Vector2i = px) -> Vector2i:
+	return world_px / px_per_cell
 	
-func get_mouse_px_position() -> Vector2i:
-	return Vector2i(get_viewport().get_mouse_position()) + px_position
+func screen_px_to_px(screen_px_pos: Vector2i) -> Vector2i:
+	return screen_px_pos + px 
 
-func get_mouse_cell_idx() -> Vector2i:
-	return get_cell_idx(get_mouse_px_position())
-	
-func draw_terrain(color: Color, world_rect: Rect2i) -> void:
-	_draw_to_img(world_terrain_img, world_terrain_tex, color, world_rect)
+func get_mouse_screen_float_px() -> Vector2:
+	return get_viewport().get_mouse_position()
 
-func draw_velocity(color: Color, world_rect: Rect2i) -> void:
-	_draw_to_img(world_velocity_img, world_velocity_tex, color, world_rect)
+func get_mouse_screen_px() -> Vector2i:
+	return Vector2i(get_mouse_screen_float_px())
 	
-func erase(world_rect: Rect2i) -> void:
-	draw_terrain(TerrainColor.EMPTY_COLOR, world_rect)
-	draw_velocity(VelocityColor.EMPTY_COLOR, world_rect)
+func get_grid_locked(px_pos: Vector2) -> Vector2i:
+	#does not need to be a world px, may be screen_px that just need to snap to grid
+	return Vector2i(px_pos / float(px_per_cell)) * px_per_cell
 	
-func _draw_to_img(img: Image, tex: ImageTexture, color: Color, world_rect: Rect2i) -> void:
-	img.fill_rect(world_rect, color)
+func draw_terrain(world_cell_rect: Rect2i, color: Color) -> void:
+	_draw_to_img(world_terrain_img, world_terrain_tex, world_cell_rect, color)
+
+func draw_velocity(world_cell_rect: Rect2i, color: Color) -> void:
+	_draw_to_img(world_velocity_img, world_velocity_tex, world_cell_rect, color)
+	
+func erase(world_cell_rect: Rect2i) -> void:
+	draw_terrain(world_cell_rect, TerrainColor.EMPTY_COLOR)
+	draw_velocity(world_cell_rect, VelocityColor.EMPTY_COLOR)
+	
+func _draw_to_img(img: Image, tex: ImageTexture, world_cell_rect: Rect2i, color: Color) -> void:
+	img.fill_rect(world_cell_rect, color)
 	tex.update(img)
-	
-	
 	
 func create_gradient_random_image(w: int, h: int) -> Image:
 	var start_time = Time.get_ticks_msec()

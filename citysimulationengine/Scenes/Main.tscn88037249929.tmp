@@ -71,7 +71,6 @@ unique_name_in_owner = true
 visible = false
 offset_right = 40.0
 offset_bottom = 40.0
-mouse_filter = 2
 
 [node name="TextDisplay" type="RichTextLabel" parent="UserInterface"]
 unique_name_in_owner = true
@@ -92,7 +91,6 @@ anchor_bottom = 1.0
 offset_top = -31.0
 grow_horizontal = 2
 grow_vertical = 0
-caret_blink = true
 
 [node name="World" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
@@ -110,6 +108,7 @@ texture = SubResource("CanvasTexture_rgh2o")
 
 [node name="Terrain" type="TextureRect" parent="World"]
 unique_name_in_owner = true
+visible = false
 material = SubResource("ShaderMaterial_bmxlf")
 anchors_preset = 15
 anchor_right = 1.0
