@@ -65,7 +65,8 @@ func move_view(by_px: Vector2i) -> void:
 func zoom_view(by: int) -> void:
 	var old_center_cell_idx: Vector2i = (get_cell_idx() + get_screen_cell_size()/2)
 	px_per_cell = clamp(px_per_cell + by, ZOUT_PX_PER_CELL, ZIN_PX_PER_CELL)
-	var now_center_cell_idx: Vector2i = (get_cell_idx() + get_screen_cell_size()/2)  
+	var now_center_cell_idx: Vector2i = (get_cell_idx() + get_screen_cell_size()/2) 
+	#var now_center_cell_idx: Vector2i = get_cell_idx(screen_px_to_px(get_mouse_screen_px())) #attempt to zoom to mouse (fail)
 	var cell_shift: Vector2i = old_center_cell_idx - now_center_cell_idx
 	move_view(cell_shift * px_per_cell)
 	update_view()
