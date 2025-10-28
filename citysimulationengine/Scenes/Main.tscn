@@ -38,6 +38,7 @@ shader = ExtResource("5_50glp")
 [sub_resource type="CanvasTexture" id="CanvasTexture_frkhe"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1p5hy"]
+render_priority = 0
 shader = ExtResource("6_vy5pj")
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_h1m7h"]
