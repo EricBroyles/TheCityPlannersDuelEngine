@@ -32,6 +32,9 @@ var command_line_focus: bool = false
 
 var draw_struct: DrawStruct = DrawStruct.create_empty()
 
+var cmd_history: Array[String] = [] #just the order in which I have called commands
+var cmd_history_idx: int = 0 
+
 func _ready() -> void:
 	close_brush()
 	
@@ -47,6 +50,8 @@ func _process(delta: float) -> void:
 func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_released("enter"): run_command()
 	if Input.is_action_just_released("escape"): clear()
+	if Input.is_action_just_released("up_arrow"): access_cmd_history(+1)
+	if Input.is_action_just_released("down_arrow"): access_cmd_history(-1)
 
 func _unhandled_input(_event: InputEvent) -> void:
 	unhandled_move()
@@ -70,16 +75,35 @@ func run_command() -> void:
 				"speed": world.speed_mph.visible = !world.speed_mph.visible 
 				"speed_mph": world.speed_mph.visible = !world.speed_mph.visible #allow either speed or speedd_mph
 				"direction": world.direction.visible = !world.direction.visible 
-			pass
 		"help": pass
 		"": pass
 		_: push_error("USER INPUT ERROR: no matching command")
+	cmd_history.push_front(command_line.text)
 	clear_command_line()
 	
 func clear_command_line() -> void:
 	command_line.text = ""
 	command_line.release_focus()
-
+	
+func access_cmd_history(idx_delta: int) -> void:
+	print(cmd_history, cmd_history_idx)
+	if not command_line_focus: return
+	if cmd_history.size() == 0 : return
+	
+	if cmd_history_idx + idx_delta < 0: 
+		command_line.text = ""
+		cmd_history_idx = 0
+	
+	elif cmd_history_idx + idx_delta > cmd_history.size()-1:
+		command_line.text = cmd_history[cmd_history.size()-1]
+		cmd_history_idx = cmd_history.size()-1
+		
+	else:
+		if idx_delta < 0: command_line.text = cmd_history[cmd_history_idx + idx_delta]
+		else: command_line.text = cmd_history[cmd_history_idx]
+		cmd_history_idx = cmd_history_idx + idx_delta
+	
+	
 func open_brush(cmd_tokens: Array[String]) -> void:
 	brush.visible = true
 	draw_struct = DrawStruct.create(cmd_tokens)
