@@ -10,7 +10,8 @@ class_name UserInterface
 
 ## Commands
 # draw road brush(10, 10)  --- must have draw first | exact spacing does not matter 
-# draw velocity(100, ne) brush(10, 10)
+# draw speed(100) direction(ne) brush(10, 10)
+# draw road junction1 speed(100) direction(any) brush(10,10)
 # erase brush(10, 10) or draw erase brush(10,10)
 
 @onready var world: World = %World
@@ -69,7 +70,6 @@ func clear_command_line() -> void:
 	command_line.release_focus()
 
 func open_brush(cmd_tokens: Array[String]) -> void:
-	print("here")
 	brush.visible = true
 	draw_struct = DrawStruct.create(cmd_tokens)
 	brush.size = draw_struct.get_px_size()
@@ -115,13 +115,17 @@ func handle_zoom() -> void:
 	
 func unhandled_left_click() -> void:
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		if draw_struct.draw_type == DrawStruct.DRAW_TYPE.NONE: return
+		if draw_struct.type == DrawStruct.NONE: return
 		var world_px: Vector2i = world.screen_px_to_px(Vector2i(brush.position))
 		var world_cell_rect: Rect2i = Rect2i(world.get_cell_idx(world_px), draw_struct.brush_cell_size)
-		match draw_struct.draw_type:
-			DrawStruct.DRAW_TYPE.ERASE: world.erase(world_cell_rect)
-			DrawStruct.DRAW_TYPE.TERRAIN: world.draw_terrain(world_cell_rect, draw_struct.terrain_color.color)
-			DrawStruct.DRAW_TYPE.VELOCITY: world.draw_velocity(world_cell_rect, draw_struct.velocity_color.color)
+		match draw_struct.type:
+			DrawStruct.ERASE: 
+				world.erase(world_cell_rect) 
+			DrawStruct.DRAW: 
+				if not draw_struct.terrain_type_color.is_empty(): world.draw_terrain_type(world_cell_rect, draw_struct.terrain_type_color)
+				if not draw_struct.terrain_mod_color.is_empty(): world.draw_terrain_mod(world_cell_rect, draw_struct.terrain_mod_color)
+				if not draw_struct.speed_mph_color.is_empty(): world.draw_speed_mph(world_cell_rect, draw_struct.speed_mph_color)
+				if not draw_struct.direction_color.is_empty(): world.draw_direction(world_cell_rect, draw_struct.direction_color)
 
 func _on_command_line_focus_entered() -> void:
 	command_line_focus = true

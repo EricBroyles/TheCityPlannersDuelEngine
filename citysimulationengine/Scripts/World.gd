@@ -1,12 +1,9 @@
 extends CanvasLayer
 class_name World
 
-## Background: color1, color2, px_per_cell, cell_size
-
-# Cell Size = Size in terms of cells
-
 @onready var background: TextureRect = %Background
-@onready var terrain: TextureRect = %Terrain
+@onready var terrain_type: TextureRect = %TerrainType
+@onready var terrain_mod: TextureRect = %TerrainMod
 @onready var speed: TextureRect = %Speed
 @onready var direction: TextureRect = %Direction
 
@@ -19,24 +16,27 @@ const ZOUT_PX_PER_CELL: int = int(12/4.0)
 var px_per_cell: int = Z1_PX_PER_CELL
 var px: Vector2i = Vector2i(0,0) #top left px position
 
-## World: each px represents a cell for the entire world
-var world_terrain_img: Image = Image.create_empty(CELL_COLS, CELL_ROWS, false, TerrainColor.IMAGE_FORMAT)
-var world_terrain_tex: ImageTexture = ImageTexture.create_from_image(world_terrain_img)
-var world_velocity_img: Image = Image.create_empty(CELL_COLS, CELL_ROWS, false, VelocityColor.IMAGE_FORMAT)
-var world_velocity_tex: ImageTexture = ImageTexture.create_from_image(world_velocity_img)
+var terrain_type_img: Image = Image.create_empty(CELL_COLS, CELL_ROWS, false, TerrainTypeColor.IMAGE_FORMAT)
+var terrain_mod_img : Image = Image.create_empty(CELL_COLS, CELL_ROWS, false, TerrainModColor.IMAGE_FORMAT)
+var speed_mph_img   : Image = Image.create_empty(CELL_COLS, CELL_ROWS, false, SpeedMPHColor.IMAGE_FORMAT)
+var direction_img   : Image = Image.create_empty(CELL_COLS, CELL_ROWS, false, DirectionColor.IMAGE_FORMAT)
+
+var terrain_type_tex: ImageTexture = ImageTexture.create_from_image(terrain_type_img)
+var terrain_mod_tex : ImageTexture = ImageTexture.create_from_image(terrain_mod_img)
+var speed_mph_tex   : ImageTexture = ImageTexture.create_from_image(speed_mph_img)
+var direction_tex   : ImageTexture = ImageTexture.create_from_image(direction_img)
+
+
+
 
 func _ready() -> void:
 	
-	world_terrain_img.fill(TerrainColor.EMPTY_COLOR)
-	#world_terrain_img = create_gradient_random_image(CELL_COLS, CELL_ROWS) ## REMOVE
-	world_terrain_tex.update(world_terrain_img)
-	
-	world_velocity_img.fill(VelocityColor.EMPTY_COLOR)
-	world_velocity_tex.update(world_velocity_img)
-	
 	background.material.set_shader_parameter("world_cell_size", Vector2i(CELL_COLS, CELL_ROWS))
-	terrain.material.set_shader_parameter("world_data_tex", world_terrain_tex)
+	terrain_type.material.set_shader_parameter("color_map", TerrainTypeColor.get_color_map())
 	
+	terrain_type.material.set_shader_parameter("world_data_tex", terrain_type_tex)
+	terrain_mod.material.set_shader_parameter("world_data_tex", terrain_mod_tex)
+
 	update_view()
 	
 func _process(_delta: float) -> void:
@@ -52,8 +52,10 @@ func _process(_delta: float) -> void:
 func update_view() -> void:
 	background.material.set_shader_parameter("px_per_cell", px_per_cell)
 	background.material.set_shader_parameter("px_position", px)
-	terrain.material.set_shader_parameter("px_per_cell", px_per_cell)
-	terrain.material.set_shader_parameter("px_position", px)
+	terrain_type.material.set_shader_parameter("px_per_cell", px_per_cell)
+	terrain_type.material.set_shader_parameter("px_position", px)
+	terrain_mod.material.set_shader_parameter("px_per_cell", px_per_cell)
+	terrain_mod.material.set_shader_parameter("px_position", px)
 	
 func move_view(by_px: Vector2i) -> void:
 	px += by_px
@@ -90,22 +92,34 @@ func get_mouse_screen_px() -> Vector2i:
 	return Vector2i(get_mouse_screen_float_px())
 	
 func get_grid_locked(px_pos: Vector2) -> Vector2i:
+	#this does not work.
 	#does not need to be a world px, may be screen_px that just need to snap to grid
 	return Vector2i(px_pos / float(px_per_cell)) * px_per_cell
-	
-func draw_terrain(world_cell_rect: Rect2i, color: Color) -> void:
-	_draw_to_img(world_terrain_img, world_terrain_tex, world_cell_rect, color)
 
-func draw_velocity(world_cell_rect: Rect2i, color: Color) -> void:
-	_draw_to_img(world_velocity_img, world_velocity_tex, world_cell_rect, color)
+func erase(world_cell_rect) -> void:
+	draw_terrain_type(world_cell_rect, TerrainTypeColor.create_empty())
+	draw_terrain_mod(world_cell_rect, TerrainModColor.create_empty())
+	draw_speed_mph(world_cell_rect, SpeedMPHColor.create_empty())
+	draw_direction(world_cell_rect, DirectionColor.create_empty())
+
+func draw_terrain_type(world_cell_rect: Rect2i, cc: TerrainTypeColor) -> void:
+	_draw_to_img(terrain_type_img, terrain_type_tex, world_cell_rect, cc.get_color())
 	
-func erase(world_cell_rect: Rect2i) -> void:
-	draw_terrain(world_cell_rect, TerrainColor.EMPTY_COLOR)
-	draw_velocity(world_cell_rect, VelocityColor.EMPTY_COLOR)
+func draw_terrain_mod(world_cell_rect: Rect2i, cc: TerrainModColor) -> void:
+	_draw_to_img(terrain_mod_img, terrain_mod_tex, world_cell_rect, cc.get_color())
 	
-func _draw_to_img(img: Image, tex: ImageTexture, world_cell_rect: Rect2i, color: Color) -> void:
-	img.fill_rect(world_cell_rect, color)
+func draw_speed_mph(world_cell_rect: Rect2i, cc: SpeedMPHColor) -> void:
+	_draw_to_img(speed_mph_img, speed_mph_tex, world_cell_rect, cc.get_color())
+	
+func draw_direction(world_cell_rect: Rect2i, cc: DirectionColor) -> void:
+	_draw_to_img(direction_img, direction_tex, world_cell_rect, cc.get_color())
+	
+func _draw_to_img(img: Image, tex: ImageTexture, world_cell_rect: Rect2i, c: Color) -> void:
+	img.fill_rect(world_cell_rect, c)
 	tex.update(img)
+	
+
+	
 	
 func create_gradient_random_image(w: int, h: int) -> Image:
 	var start_time = Time.get_ticks_msec()

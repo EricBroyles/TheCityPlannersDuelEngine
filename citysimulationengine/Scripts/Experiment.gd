@@ -20,43 +20,58 @@ extends Node2D
 #RGBAH	4	16-bit	Signed float	Not suitable for integers beyond ±65504
 #RGBAF	4	32-bit	Signed float	Precise up to ±16,777,216, after that it loses integer precision
 
+
+
+# RGBA Float: -16,777,216 -> 16,777,216
+
+
+
+
+
+
+
 const UNSIGNED_INT8_MAX : float = 255
-const UNSIGNED_INT32_MAX: float = 2147483647 #4294967295
+const SIGNED_INT32_MAX: float = 2147483647 #4294967295
 var rgba8_img: Image = Image.create(1,1,false,Image.FORMAT_RGBA8) #each channel has bit depth of 8
 var rgba32_img: Image = Image.create(1,1,false,Image.FORMAT_RGBAF) #each channel has 32 bit floating point
-var my_num: int = -2140000000
+var my_num: int =  1
 
 @onready var text_rect: TextureRect = %TextureRect
 
 func _ready() -> void:
+	var n: float = 4294967294 / 4294967295.0
+	
+	print(Color(n, 0, 10000, 1000000))
+	print(Color(n*4294967295, 0, 0,0))
+	print(Color(4294967295.0, 0,0,0))
+	
+	
 	var rgba8_encoded_num: float = my_num / UNSIGNED_INT8_MAX
-	var rgba32_encoded_num: float = my_num / UNSIGNED_INT32_MAX
+	var rgba32_encoded_num: float = my_num / SIGNED_INT32_MAX
 	var rgba8_color: Color = Color(rgba8_encoded_num,0,0,0)
-	var rgba32_color: Color = Color(rgba32_encoded_num,0,0,0)
+	#var rgba32_color: Color = Color(rgba32_encoded_num,0,0,0)
+	
 	rgba8_img.fill(rgba8_color)
-	rgba32_img.fill(rgba32_color)
+	rgba32_img.fill(pack32_to_rgba(my_num))
 	var tex8: ImageTexture = ImageTexture.create_from_image(rgba8_img)
 	var tex32: ImageTexture = ImageTexture.create_from_image(rgba32_img)
 	
-	print("my_num: ", my_num, " | rgba8_encoded_num: ", rgba8_encoded_num, " | rgba8_color: ", rgba8_color)
-	print("my_num: ", my_num, " | rgba32_encoded_num: ", rgba32_encoded_num, " | rgba32_color: ", rgba32_color)
+	#print("my_num: ", my_num, " | rgba8_encoded_num: ", rgba8_encoded_num, " | rgba8_color: ", rgba8_color)
+	#print("my_num: ", my_num, " | rgba32_encoded_num: ", rgba32_encoded_num, " | rgba32_color: ", rgba32_color)
 	
 	text_rect.material.set_shader_parameter("my_num", my_num)
 	#text_rect.material.set_shader_parameter("conversion", UNSIGNED_INT8_MAX)
 	#text_rect.material.set_shader_parameter("tex", tex8)
 	
-	text_rect.material.set_shader_parameter("conversion", UNSIGNED_INT32_MAX)
+	text_rect.material.set_shader_parameter("conversion", SIGNED_INT32_MAX)
 	text_rect.material.set_shader_parameter("tex", tex32)
 	
 
-#packs the 32 bit int into RGBA8 format (8bit, 8bit, 8bit, 8bit)
-func pack_uint_to_color(value: int) -> Color:
-	var r = float(value & 0xFF) / 255.0
-	var g = float((value >> 8) & 0xFF) / 255.0
-	var b = float((value >> 16) & 0xFF) / 255.0
-	var a = float((value >> 24) & 0xFF) / 255.0
-	return Color(r, g, b, a)
-	
-# get a way to 
-	
+func pack32_to_rgba(v:int) -> Color:
+	return Color(
+		float((v >> 24) & 0xFF) / 255.0,
+		float((v >> 16) & 0xFF) / 255.0,
+		float((v >> 8) & 0xFF) / 255.0,
+		float(v & 0xFF) / 255.0
+	)
 	

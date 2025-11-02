@@ -1,0 +1,132 @@
+Add a new TextureRect Material:
+* add the shader
+* add the texture to a canvastexture
+* make full screen
+
+
+
+
+
+
+All the information I need.
+
+World Size: 4 mi/ 4 mi, each cell is 4 ft so 5280 cell by 5280 cell so 27 878 400 cells
+32 bit signed max: -2140000000 (exactly this, why?) -> 2 147 483 647 
+32 bit signed used range: 0 → 2 147 483 647 
+16 bit: 0 -> 65504 (16 bit signed)
+
+ACCOUNT FOR: “sampler2D (float) vs isampler2D (signed int) vs usampler2D (unsigned int)”
+
+Assumptions:
+no two agents on the same cell
+no two cars on the same cell
+agent can be on the same cell as its car
+all cars have the same size: CAR SIZE IDK YET (treat as 1 cell and when moving look around it based on its size, dont try and treat it as multi cells)
+all agents have the same size: 1 cell
+
+How many cells = WC_max * WR_max
+WC = World Cols  = 0 → 5280
+WR = World Rows = 0 → 5280
+
+How many agents = AR_max * AC_max
+AR = Agents Rows = 0 → 100
+AC = Agents Cols = 0 → 100
+
+Max Path Distance: miles_w + miles_h = 4 mi + 4 mi = 8 mi
+how far an agent can travel, if the distance they need to cover is beyond this they do not travel.
+This is needed to define a size for the AgentPaths Image.
+
+FLAT_IDX(c,r, num_c) → r*num_c + c
+get row wise idx from px position (c,r)
+
+World: RGBA8(WC, WR)
+Each px represents a world cell (4ft by 4ft)
+R --- Terrain: Road, Walkway, Crosswalk, Parking, Building, Barrier
+Encode: 0 → 4
+G --- Terrain Modifier: Junction_Stop, Junction1, Junction2, Junction3, Lane_Divider
+Encode: 0 → 4
+B --- Speed: 0 → 255 mph
+Encode: 0 → 255
+A --- Direction:  0→ 345 degrees on 45 degree increments
+Encode: 0 → 7 
+NOTE: could hypothetically compress to just two channels as 5 terrain * 5 modifier * 8 dir = 200 < 255, use 0 → 200 as an index to access 3 constant parallel arrays of size 200
+0 = 0,0,0
+1 = 0,0,1 
+2 = 0,0,2
+...
+7 = 0,0,7
+8 = 0,1,0
+9 = 0,1,1
+.....
+199 = 4,4,7
+
+match array for terrain [0, 0,  0,0  .... 4] size 200
+match array for terrain [0, 0,  0,0 .... 4 ] size 200
+match array for direction [0, 1,  2, 3, 4, 5, 6, 7, 0, 1, 2  ... 7] size 200
+
+
+Agents: RGBAF(AC, AR)
+Each px represents a unique Agent. 
+R --- position: initialize with world cell starting at. Changes as the agent moves.
+Encode: FLAT_IDX(WC, WR, WC_max)
+G --- end position:  world cell traveling to. Does not change.
+Encode: FLAT_IDX(WC, WR, WC_max)
+B --- car position: initialize with the location of the car. Changes as the car is driven.
+0 if at spot 0. need to check inventory to see if the car is owned
+A --- inventory: 1st bit = own car t/f
+
+For each agent A* path finding algorithm to determine best path.
+How to handle crosswalks.
+
+Speeds and Directions in buildings and Parking lots: should be automatically assigned, and limited speed, and allow movement in any direciton and no collisions
+* limit the number of unique spawn locaitons
+
+I am not navigating for each agent. I am finding each spawn point and end destinatin in each building and creating a network between each buildung
+spawn and each parking lot 
+
+
+A* setup: AStarGrid2D
+	* size of each cell is 4ft by 4ft, size of rect is cells row and col
+	* if speed is 0 then ignore cell (treat as barrier)
+	
+A* for just walking
+A* for driving and walking (parking)
+
+
+
+
+
+AgentPaths: RGBAF_Array
+For a RGBAF in the array:
+each px is 128 bit, every 3 bits represents the next cell to move to for a agent (0 → 7). so 42 agent’s next cell is encoded on this px.
+Algorithm considerations: if 3 bits = 0 then need to check if I am on my end location, if not move forward
+0 = move n, 1 = move ne, 2 = move e, ...
+ignore the left over bit 128 - 42*3 = 1
+I need to be able to look up in the world matrix the cell that I am currently at and information about the cell that I am moving to (velocity, is valid, is junction)
+
+
+
+
+
+WHere is their car (its location is enough to know it exists)
+store agent current position, store car current position and future position, all agents path information.
+
+agent path information I have 128 bits to play with. 
+the A* is on the cpu whihc generates this, the A* needs to consider the cars location to give the best out come. this considers avoiding obstacles, etc.
+the actual path sent to the gpu does not need to communicate if I get in a car, or speed. it just needs to comunicate which cell, and direction to next cell
+if the agent finds themself on a car they own they start to use the car if possible. 
+I need 3 bits (0 → 8 to tell me which position I need to be at after the start position
+need a max travel distance. 
+How do I look up my position (need start position and 
+
+
+The person spawns in a building cell (assigned to them before sim run).
+The person picks a destination building cell (assigned to them before sim run).
+The person may have a car, the car is located at a cell.
+car is assigned before sim runs
+car has an assigned cell before sim runs
+A* to figure out how to get to their destination the fastest.
+best to walk
+best to walk to car then drive, park somewhere and then walk to final destination
+can I navigate to the destination cell at all.
+need to account for traffic and need to account for anticipated parking spaces
