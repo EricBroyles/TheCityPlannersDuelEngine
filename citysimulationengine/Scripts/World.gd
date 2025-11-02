@@ -4,7 +4,7 @@ class_name World
 @onready var background: TextureRect = %Background
 @onready var terrain_type: TextureRect = %TerrainType
 @onready var terrain_mod: TextureRect = %TerrainMod
-@onready var speed: TextureRect = %Speed
+@onready var speed_mph: TextureRect = %SpeedMPH
 @onready var direction: TextureRect = %Direction
 
 const CELL_ROWS: int = 1000

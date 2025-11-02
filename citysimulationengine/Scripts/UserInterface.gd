@@ -13,6 +13,8 @@ class_name UserInterface
 # draw speed(100) direction(ne) brush(10, 10)
 # draw road junction1 speed(100) direction(any) brush(10,10)
 # erase brush(10, 10) or draw erase brush(10,10)
+# toggle background (hides or unhides)
+# toggle terrain_type
 
 @onready var world: World = %World
 @onready var text_display: RichTextLabel = %TextDisplay
@@ -60,6 +62,14 @@ func run_command() -> void:
 			open_brush(cmd_tokens.slice(1))
 		"erase": 
 			open_brush(cmd_tokens)
+		"toggle":
+			match cmd_tokens[1]:
+				"background": world.background.visible = !world.background.visible 
+				"terrain_type": world.terrain_type.visible = !world.terrain_type.visible 
+				"terrain_mod": world.terrain_mod.visible = !world.terrain_mod.visible 
+				"speed_mph": world.speed_mph.visible = !world.speed_mph.visible 
+				"direction": world.direction.visible = !world.direction.visible 
+			pass
 		"help": pass
 		"": pass
 		_: push_error("USER INPUT ERROR: no matching command")

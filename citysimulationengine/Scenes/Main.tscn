@@ -126,7 +126,7 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("CanvasTexture_vy5pj")
 
-[node name="Speed" type="TextureRect" parent="World"]
+[node name="SpeedMPH" type="TextureRect" parent="World"]
 unique_name_in_owner = true
 visible = false
 material = SubResource("ShaderMaterial_grg3l")
