@@ -20,7 +20,7 @@ static func create_empty() -> DrawStruct:
 
 static func create(cmd_tokens: PackedStringArray) -> DrawStruct:
 	#ex: ["road", "brush(10, 10)"]
-	#ex: ["speed_mph(100)", "direction(any)", "brush(10, 10)"]
+	#ex: ["speed(100)", "direction(any)", "brush(10, 10)"]
 	#ex: ["erase", "brush(10,10)"]
 	# NOTE: (10,10) or (10, 10) or ( 10,  10) etc. are valid
 	var draw_struct: DrawStruct = DrawStruct.create_empty()
@@ -31,16 +31,16 @@ static func create(cmd_tokens: PackedStringArray) -> DrawStruct:
 			draw_struct.type = ERASE
 			erase_found = true
 		elif token.contains("brush"):
-			var str_arr: PackedStringArray = Utils.group_to_string_array(token.replace("brush", ""))
+			var str_arr: PackedStringArray = Utils.group_to_string_array(token)
 			var w: int = clamp(str_arr[0].to_int(), MIN_BRUSH_CELL_SIZE.x, MAX_BRUSH_CELL_SIZE.x)
 			var h: int = clamp(str_arr[1].to_int(), MIN_BRUSH_CELL_SIZE.y, MAX_BRUSH_CELL_SIZE.y)
 			draw_struct.brush_cell_size = Vector2i(w, h)
 			brush_found = true
-		elif token.contains("speed_mph"):
-			var str_arr: PackedStringArray = Utils.group_to_string_array(token.replace("speed_mph", ""))
+		elif token.contains("speed"):
+			var str_arr: PackedStringArray = Utils.group_to_string_array(token)
 			draw_struct.speed_mph_color = SpeedMPHColor.create(str_arr[0].to_int())
 		elif token.contains("direction"):
-			var str_arr: PackedStringArray = Utils.group_to_string_array(token.replace("direction", ""))
+			var str_arr: PackedStringArray = Utils.group_to_string_array(token)
 			draw_struct.direction_color = DirectionColor.string_create(str_arr[0])
 		else:
 			match token: 

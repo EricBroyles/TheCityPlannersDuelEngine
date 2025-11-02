@@ -18,17 +18,28 @@ class_name Utils
 	#return VelocityColor.create(speed_mph, dir)
 		
 static func group_to_string_array(group: String) -> PackedStringArray:
-	# FORMAT "(Value, Value, ...)"
-	# ex: (100) -> Array["100"]
-	# ex: (100, ne)  -> Array["100", "100"]
+	# FORMAT "possibletext(Value, Value, ...)"
+	# ex: text(100) -> Array["100"]
+	# ex: text(100, ne)  -> Array["100", "100"]
 	# ex: (100, 100, 1000) -> Array["100", "100", "1000"]
-	var s: String = group.strip_edges()
-	if s.begins_with("(") and s.ends_with(")"):
-		s = s.substr(1, s.length() - 2)
-	else:
-		push_error("USER INPUT ERROR: group_to_string_array --- ", group)
+
+	var start_idx = group.find("(")
+	var end_idx = group.rfind(")")
+
+	if start_idx == -1 or end_idx == -1 or end_idx <= start_idx:
+		push_error("USER INPUT ERROR: Missing or malformed parentheses in input: " + group)
+		return PackedStringArray()
+
+	# Extract inside parentheses
+	var s = group.substr(start_idx + 1, end_idx - start_idx - 1).strip_edges()
+
+	# Split by commas
 	var parts: PackedStringArray = s.split(",")
-	for p in parts: p.strip_edges()
+
+	# Trim whitespace on each part
+	for i in parts.size():
+		parts[i] = parts[i].strip_edges()
+
 	return parts
 	
 ## COLORS

@@ -26,9 +26,9 @@ void fragment() {
     vec2 cell_idx = floor(world_pos_px / px_per_cell);
     vec2 cell_uv = cell_idx / vec2(tex_size);
     
-    int idx = int(texture(world_data_tex, cell_uv).r * 255.0);
+    int my_mod = int(texture(world_data_tex, cell_uv).r * 255.0);
 
-    if (idx == 0) {
+    if (my_mod == 0) {
         discard;
     }
     
@@ -46,12 +46,12 @@ void fragment() {
     vec4 final_color;
     float alpha = 1.0;
 
-    if (idx == 1) {
+    if (my_mod == 1) {
         // Solid red, fully opaque
         final_color = PHASE_RED;
         alpha = 1.0;
     }
-    else if (idx >= 2 && idx <= 4) {
+    else if (my_mod >= 2 && my_mod <= 4) {
         float t = fract(TIME * speed);
 
         if (t < 0.33) {
@@ -64,12 +64,12 @@ void fragment() {
             float f = (t - 0.66) / 0.34;
             final_color = mix(PHASE_GREEN, PHASE_RED, f);
         }
-        // Set alpha based on idx
-        if (idx == 2) alpha = 0.8;
-        else if (idx == 3) alpha = 0.7;
-        else if (idx == 4) alpha = 0.6;
+        // Set alpha based on my_mod
+        if (my_mod == 2) alpha = 0.8;
+        else if (my_mod == 3) alpha = 0.7;
+        else if (my_mod == 4) alpha = 0.6;
     }
-    else if (idx == 5) {
+    else if (my_mod == 5) {
         float t = abs(sin(TIME * speed));
         final_color = mix(GREY_DARK, GREY_LIGHT, t);
         alpha = 0.8;

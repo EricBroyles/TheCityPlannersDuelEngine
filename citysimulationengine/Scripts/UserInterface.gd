@@ -67,7 +67,8 @@ func run_command() -> void:
 				"background": world.background.visible = !world.background.visible 
 				"terrain_type": world.terrain_type.visible = !world.terrain_type.visible 
 				"terrain_mod": world.terrain_mod.visible = !world.terrain_mod.visible 
-				"speed_mph": world.speed_mph.visible = !world.speed_mph.visible 
+				"speed": world.speed_mph.visible = !world.speed_mph.visible 
+				"speed_mph": world.speed_mph.visible = !world.speed_mph.visible #allow either speed or speedd_mph
 				"direction": world.direction.visible = !world.direction.visible 
 			pass
 		"help": pass

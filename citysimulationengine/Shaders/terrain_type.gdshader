@@ -13,13 +13,13 @@ void fragment() {
     ivec2 tex_size = textureSize(world_data_tex, 0);
     vec2 cell_uv = cell_idx / vec2(tex_size);
 
-    // Decode terrain IDs
-    int idx = int(texture(world_data_tex, cell_uv).r * 255.0);
+    // Decode terrain type
+    int my_type = int(texture(world_data_tex, cell_uv).r * 255.0);
 
     // Base terrain color
     vec4 c = vec4(1.0);
-    if (idx >= 0 && idx < 7) {
-        c = color_map[idx];
+    if (my_type >= 0 && my_type < 7) {
+        c = color_map[my_type];
     }
 
     COLOR = c;

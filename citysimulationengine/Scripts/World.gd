@@ -36,6 +36,7 @@ func _ready() -> void:
 	
 	terrain_type.material.set_shader_parameter("world_data_tex", terrain_type_tex)
 	terrain_mod.material.set_shader_parameter("world_data_tex", terrain_mod_tex)
+	speed_mph.material.set_shader_parameter("world_data_tex", speed_mph_tex)
 
 	update_view()
 	
@@ -56,6 +57,8 @@ func update_view() -> void:
 	terrain_type.material.set_shader_parameter("px_position", px)
 	terrain_mod.material.set_shader_parameter("px_per_cell", px_per_cell)
 	terrain_mod.material.set_shader_parameter("px_position", px)
+	speed_mph.material.set_shader_parameter("px_per_cell", px_per_cell)
+	speed_mph.material.set_shader_parameter("px_position", px)
 	
 func move_view(by_px: Vector2i) -> void:
 	px += by_px
