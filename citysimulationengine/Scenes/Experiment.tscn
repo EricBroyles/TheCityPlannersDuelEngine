@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://gxvjhp7oxbwx"]
 
 [ext_resource type="Script" uid="uid://cy83nu4d8susj" path="res://Scripts/Experiment.gd" id="1_vovyc"]
-[ext_resource type="Shader" uid="uid://dxfm7twg68rd4" path="res://Shaders/experiment_sampler2d_datasize.gdshader" id="2_gjcfw"]
+[ext_resource type="Shader" uid="uid://dxfm7twg68rd4" path="res://Shaders/_experiment_sampler2d_datasize.gdshader" id="2_gjcfw"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mwlpf"]
 shader = ExtResource("2_gjcfw")

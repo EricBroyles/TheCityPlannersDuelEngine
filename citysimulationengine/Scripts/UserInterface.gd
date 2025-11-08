@@ -13,8 +13,15 @@ class_name UserInterface
 # draw speed(100) direction(ne) brush(10, 10)
 # draw road junction1 speed(100) direction(any) brush(10,10)
 # erase brush(10, 10) or draw erase brush(10,10)
-# toggle background (hides or unhides)
-# toggle terrain_type
+# toggle background -> (hides or unhides background)
+# toggle terrain_type -> 
+# draw road brush -> default bursh is (10,10)
+# draw speed -> warning: no (#) provided
+# draw direction -> warning: no (str) provided
+# draw road -> draws the road with 10,10 brush
+# draw road brush -> same as draw road
+# draw road brush(10,10) -> you get the idea.
+
 
 @onready var world: World = %World
 @onready var text_display: RichTextLabel = %TextDisplay
@@ -24,15 +31,11 @@ class_name UserInterface
 var time_delta: float
 var move_speed: float = 1000.0
 var zoom_speed: float = 1.0
-
 var move_dir: Vector2 = Vector2.ZERO
 var zoom_dir: int = 0
-
 var command_line_focus: bool = false
-
 var draw_struct: DrawStruct = DrawStruct.create_empty()
-
-var cmd_history: Array[String] = [] #just the order in which I have called commands
+var cmd_history: Array[String] = [] 
 var cmd_history_idx: int = 0 
 
 func _ready() -> void:
@@ -48,7 +51,7 @@ func _process(delta: float) -> void:
 		move_brush()
 	
 func _input(_event: InputEvent) -> void:
-	if Input.is_action_just_released("enter"): run_command()
+	if Input.is_action_just_released("enter"): run_command(command_line.text)
 	if Input.is_action_just_released("escape"): clear()
 	if Input.is_action_just_released("up_arrow"): access_cmd_history(+1)
 	if Input.is_action_just_released("down_arrow"): access_cmd_history(-1)
@@ -60,13 +63,22 @@ func clear() -> void:
 	clear_command_line()
 	close_brush()	
 		
-func run_command() -> void:
-	var cmd_tokens: PackedStringArray = command_line.text.to_lower().strip_edges().split(" ")
+func run_command(cmd: String) -> void:
+	var cmd_tokens: PackedStringArray = cmd.to_lower().strip_edges().split(" ")
 	match cmd_tokens[0]:
 		"draw": 
 			open_brush(cmd_tokens.slice(1))
 		"erase": 
 			open_brush(cmd_tokens)
+		"show": 
+			match cmd_tokens[1]:
+				"background": world.background.visible = true 
+				"terrain_type": world.terrain_type.visible = true
+				"terrain_mod": world.terrain_mod.visible = true
+				"speed": world.speed_mph.visible = true 
+				"speed_mph": world.speed_mph.visible = true 
+				"direction": world.direction.visible = true
+				"velocity": world.speed_mph.visible = true; world.direction.visible = true;
 		"toggle":
 			match cmd_tokens[1]:
 				"background": world.background.visible = !world.background.visible 
@@ -75,6 +87,10 @@ func run_command() -> void:
 				"speed": world.speed_mph.visible = !world.speed_mph.visible 
 				"speed_mph": world.speed_mph.visible = !world.speed_mph.visible #allow either speed or speedd_mph
 				"direction": world.direction.visible = !world.direction.visible 
+				"velocity": world.speed_mph.visible = !world.speed_mph.visible; world.direction.visible = !world.direction.visible ;
+		"clear":
+			match cmd_tokens[1]:
+				"history": cmd_history = []; cmd_history_idx = 0;
 		"help": pass
 		"": pass
 		_: push_error("USER INPUT ERROR: no matching command")
@@ -86,18 +102,14 @@ func clear_command_line() -> void:
 	command_line.release_focus()
 	
 func access_cmd_history(idx_delta: int) -> void:
-	print(cmd_history, cmd_history_idx)
 	if not command_line_focus: return
 	if cmd_history.size() == 0 : return
-	
 	if cmd_history_idx + idx_delta < 0: 
 		command_line.text = ""
 		cmd_history_idx = 0
-	
 	elif cmd_history_idx + idx_delta > cmd_history.size()-1:
 		command_line.text = cmd_history[cmd_history.size()-1]
 		cmd_history_idx = cmd_history.size()-1
-		
 	else:
 		if idx_delta < 0: command_line.text = cmd_history[cmd_history_idx + idx_delta]
 		else: command_line.text = cmd_history[cmd_history_idx]
@@ -107,6 +119,7 @@ func access_cmd_history(idx_delta: int) -> void:
 func open_brush(cmd_tokens: Array[String]) -> void:
 	brush.visible = true
 	draw_struct = DrawStruct.create(cmd_tokens)
+	#if draw_struct.push_cmd != "": run_command(draw_struct.push_cmd)
 	brush.size = draw_struct.get_px_size()
 	brush.color = draw_struct.brush_color
 

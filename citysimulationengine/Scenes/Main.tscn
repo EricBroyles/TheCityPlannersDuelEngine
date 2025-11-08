@@ -1,13 +1,17 @@
-[gd_scene load_steps=21 format=4 uid="uid://dbvl5vfe620q"]
+[gd_scene load_steps=25 format=4 uid="uid://dbvl5vfe620q"]
 
 [ext_resource type="Script" uid="uid://6i2s4kjbc3x2" path="res://Scripts/UserInterface.gd" id="1_r150o"]
 [ext_resource type="Script" uid="uid://biimumy7jo6r7" path="res://Scripts/World.gd" id="2_kln2b"]
 [ext_resource type="Shader" uid="uid://s18xcy1vgsiu" path="res://Shaders/background.gdshader" id="3_rgh2o"]
 [ext_resource type="Shader" uid="uid://dmenc3v2os2lh" path="res://Shaders/terrain_type.gdshader" id="4_50glp"]
-[ext_resource type="Shader" uid="uid://dqcv7p5wtp5g7" path="res://Shaders/velocity.gdshader" id="4_rgh2o"]
+[ext_resource type="Shader" uid="uid://dqcv7p5wtp5g7" path="res://Shaders/_velocity.gdshader" id="4_rgh2o"]
 [ext_resource type="Shader" uid="uid://ijl8refscqgv" path="res://Shaders/terrain_mod.gdshader" id="5_vy5pj"]
 [ext_resource type="Shader" uid="uid://bqeff7fuubhiv" path="res://Shaders/speed_mph.gdshader" id="6_50glp"]
+[ext_resource type="Texture2D" uid="uid://dml8j7e8o1wj4" path="res://Assets/Junction3.svg" id="6_bmxlf"]
+[ext_resource type="Texture2D" uid="uid://cagrimex4ukke" path="res://Assets/Junction1.svg" id="6_grg3l"]
 [ext_resource type="Shader" uid="uid://cft1qxy0ih5fl" path="res://Shaders/direction.gdshader" id="6_vy5pj"]
+[ext_resource type="Texture2D" uid="uid://b8tgcdcpex523" path="res://Assets/Junction2.svg" id="7_frkhe"]
+[ext_resource type="Texture2D" uid="uid://nnt3op80wcjh" path="res://Assets/JunctionStop.svg" id="9_1p5hy"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_idj7w"]
 bg_color = Color(0, 0, 0, 1)
@@ -17,9 +21,9 @@ shader = ExtResource("3_rgh2o")
 shader_parameter/world_cell_size = Vector2i(0, 0)
 shader_parameter/px_per_cell = 32.0
 shader_parameter/px_position = Vector2(0, 0)
-shader_parameter/color1 = Vector4(0.3, 0.6, 0.2, 1)
-shader_parameter/color2 = Vector4(0.45, 0.33, 0.2, 1)
-shader_parameter/color3 = Vector4(0.5, 0.5, 0.5, 1)
+shader_parameter/color1 = Vector3(0.647, 0.925, 0.588)
+shader_parameter/color2 = Vector3(0.475, 0.796, 0.408)
+shader_parameter/color3 = Vector3(0.255, 0.737, 0.157)
 shader_parameter/edge_fade_cells = 10
 shader_parameter/noise_scale = 0.15
 shader_parameter/noise_threshold = 0.5
@@ -36,11 +40,12 @@ shader_parameter/px_position = Vector2(0, 0)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_50glp"]
 shader = ExtResource("5_vy5pj")
+shader_parameter/junction_stop = ExtResource("9_1p5hy")
+shader_parameter/junction1 = ExtResource("6_grg3l")
+shader_parameter/junction2 = ExtResource("7_frkhe")
+shader_parameter/junction3 = ExtResource("6_bmxlf")
 shader_parameter/px_per_cell = 0.0
 shader_parameter/px_position = Vector2(0, 0)
-shader_parameter/radius = 0.4
-shader_parameter/feather = 0.02
-shader_parameter/speed = 0.1
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_vy5pj"]
 
@@ -57,9 +62,8 @@ shader = ExtResource("6_vy5pj")
 [sub_resource type="CanvasTexture" id="CanvasTexture_h1m7h"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_v1gob"]
+render_priority = 0
 shader = ExtResource("4_rgh2o")
-shader_parameter/px_per_cell = 0.0
-shader_parameter/px_position = Vector2(0, 0)
 
 [node name="Main" type="Node2D"]
 
@@ -130,6 +134,7 @@ texture = SubResource("CanvasTexture_vy5pj")
 
 [node name="SpeedMPH" type="TextureRect" parent="World"]
 unique_name_in_owner = true
+visible = false
 material = SubResource("ShaderMaterial_grg3l")
 anchors_preset = 15
 anchor_right = 1.0
