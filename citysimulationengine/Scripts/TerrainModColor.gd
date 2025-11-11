@@ -11,6 +11,15 @@ static func create(m: int) -> TerrainModColor:
 	tm_color.mod = m
 	return tm_color
 	
+static func string_create(string: String) -> TerrainModColor:
+	match string:
+		"lane_divider": return TerrainModColor.create(LANE_DIVIDER)
+		"junction_stop": return TerrainModColor.create(JUNCTION_STOP)
+		"junction1": return TerrainModColor.create(JUNCTION1)
+		"junction2": return TerrainModColor.create(JUNCTION2)
+		"junction3": return TerrainModColor.create(JUNCTION3)
+		_: return TerrainModColor.create_empty() 
+	
 func is_empty() -> bool:
 	if mod == NONE: return true
 	return false

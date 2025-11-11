@@ -1,4 +1,12 @@
-Add a new TextureRect Material:
+Abriviations: 
+	CELL_SIZE == CSIZE
+
+
+
+
+
+
+dd a new TextureRect Material:
 * add the shader
 * add the texture to a canvastexture
 * make full screen

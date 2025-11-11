@@ -20,7 +20,9 @@ static func string_create(d: String) -> DirectionColor:
 		"s": dir_color.dir = S
 		"se": dir_color.dir = SE
 		"all": dir_color.dir = ALL
-		_: push_warning("USER INPUT ERROR: string_create for DirectionColor - ", d)
+		_: 
+			dir_color.dir = NONE
+			push_warning("USER INPUT ERROR: (set to NONE) string_create for DirectionColor - ", d)
 	return dir_color
 			
 static func create(d: int) -> DirectionColor:

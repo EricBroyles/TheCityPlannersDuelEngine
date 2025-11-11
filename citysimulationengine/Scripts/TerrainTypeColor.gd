@@ -12,6 +12,16 @@ static func create(t: int) -> TerrainTypeColor:
 	tt_color.type = t
 	return tt_color
 	
+static func string_create(string: String) -> TerrainTypeColor:
+	match string:
+		"road": return TerrainTypeColor.create(ROAD)
+		"walkway": return TerrainTypeColor.create(WALKWAY)
+		"crosswalk": return TerrainTypeColor.create(CROSSWALK)
+		"parking": return TerrainTypeColor.create(PARKING)
+		"building": return TerrainTypeColor.create(BUILDING)
+		"barrier": return TerrainTypeColor.create(BARRIER)
+		_: return TerrainTypeColor.create_empty() 
+	
 func is_empty() -> bool:
 	if type == NONE: return true
 	return false
