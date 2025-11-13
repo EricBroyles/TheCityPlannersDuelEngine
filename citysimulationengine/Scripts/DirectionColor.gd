@@ -24,17 +24,28 @@ const S   : String = "01000000"
 const SE  : String = "10000000"
 
 #[direct match, if multi_dir is true...]
+const NONE_WITH_MULTI: PackedStringArray = [NONE]
+const ALL_WITH_MULTI : PackedStringArray = [ALL]
+const E_WITH_MULTI   : PackedStringArray = [E, N, S, NE, SE]
+const NE_WITH_MULTI  : PackedStringArray = [NE, N, E, NW, SE]
+const N_WITH_MULTI   : PackedStringArray = [N, NE, NW, E, W]
+const NW_WITH_MULTI  : PackedStringArray = [NW, N, W, NE, SW]
+const W_WITH_MULTI   : PackedStringArray = [W, N, S, NW, SW]
+const SW_WITH_MULTI  : PackedStringArray = [SW, S, W, SE, NW]
+const S_WITH_MULTI   : PackedStringArray = [S, SE, SW, E, W]
+const SE_WITH_MULTI  : PackedStringArray = [SE, S, E, SW, NE]
+
 const DIR_STR_MAP: Dictionary = {
-	"none": [NONE],
-	"all" : [ALL],
-	"e"   : [E, N, S, NE, SE],
-	"ne"  : [NE, N, E, NW, SE],
-	"n"   : [N, NE, NW, E, W],
-	"nw"  : [NW, N, W, NE, SW],
-	"w"   : [W, N, S, NW, SW],
-	"sw"  : [SW, S, W, SE, NW],
-	"s"   : [S, SE, SW, E, W],
-	"se"  : [SE, S, E, SW, NE]
+	"none": NONE_WITH_MULTI,
+	"all" : ALL_WITH_MULTI,
+	"e"   : E_WITH_MULTI,
+	"ne"  : NE_WITH_MULTI,
+	"n"   : N_WITH_MULTI,
+	"nw"  : NW_WITH_MULTI,
+	"w"   : W_WITH_MULTI,
+	"sw"  : SW_WITH_MULTI,
+	"s"   : S_WITH_MULTI,
+	"se"  : SE_WITH_MULTI,
 }
 
 var dir_bit_str: String = NONE

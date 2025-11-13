@@ -314,13 +314,18 @@ func extract_param_group(param_token: String) -> PackedStringArray:
 	# split based on ","
 	# ex: brush(10,10) -> ["10", "10"], brush -> [], bursh( -> [], brush(10,10 -> ["10", "10"]
 	var param_group: PackedStringArray = []
-	var start_idx: int = param_token.find("(")
-	if start_idx == -1: return param_group
-	start_idx += 1
-	var end_idx: int = param_token.find(")")
-	if end_idx != -1: end_idx += 1 
-	var inside: String = param_token.substr(start_idx, end_idx).strip_edges()
-	for p in inside.split(",", false): param_group.append(p.strip_edges())
+	var regex: RegEx = RegEx.new()
+	regex.compile("\\(([^)]*)\\)?") # capture everything after '(' up to ')' if present
+
+	var result: RegExMatch = regex.search(param_token)
+	if result == null: return param_group
+
+	var inside: String = result.get_string(1).strip_edges()
+	if inside == "": return param_group
+
+	for p in inside.split(",", false):
+		param_group.append(p.strip_edges())
+
 	return param_group
 
 func extract_terrain_type_color(paramname: String) -> TerrainTypeColor:

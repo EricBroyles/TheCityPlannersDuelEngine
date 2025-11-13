@@ -44,7 +44,7 @@ class_name Utils
 	#
 ### COLORS
 
-static func combine_bit_strs(bit_strs: Array[String]) -> String:
+static func combine_bit_strs(bit_strs: PackedStringArray) -> String:
 	#assumes bit_strs are all of the same size
 	# ex: 00110010
 	#     01010101
