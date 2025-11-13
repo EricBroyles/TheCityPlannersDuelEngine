@@ -74,6 +74,10 @@ const DRAW_PARAMS_MAP: Dictionary = {
 	"brush": 		 ["brush",         BSH, V2i],
 }
 
+const ERASE_PARAMS_MAP: Dictionary = {
+	"brush": 		 ["brush",         BSH, V2i],
+}
+
 @onready var world: World = %World
 @onready var text_display: RichTextLabel = %TextDisplay
 @onready var cmdline: LineEdit = %CommandLine
@@ -103,6 +107,9 @@ func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_released("escape"): reset()
 	if Input.is_action_just_released("up_arrow"): access_cmd_history(+1)
 	if Input.is_action_just_released("down_arrow"): access_cmd_history(-1)
+	
+func _unhandled_input(_event: InputEvent) -> void:
+	unhandled_move()
 	
 func reset() -> void:
 	clear_cmdline()
@@ -154,7 +161,7 @@ func handle_left_click() -> void:
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		if draw_struct.type == DrawStruct.NONE: return
 		var world_px: Vector2i = world.screen_px_to_px(Vector2i(brush.position))
-		var world_cell_rect: Rect2i = Rect2i(world.get_cell_idx(world_px), draw_struct.brush_cell_size)
+		var world_cell_rect: Rect2i = Rect2i(world.get_cell_idx(world_px), draw_struct.brush_csize)
 		match draw_struct.type:
 			DrawStruct.ERASE: 
 				world.erase(world_cell_rect) 
@@ -180,14 +187,14 @@ func run_cmd(cmd: String) -> void:
 	
 	var funcname: String = cmd_tokens[0].strip_edges()
 	if FUNCNAMES_MAP.has(funcname): funcname = FUNCNAMES_MAP[funcname]
-	else: push_warning("INPUT: [%s] PROBLEM: [%s] RESULT: [%s]" % [cmd, "no valid funcname", "cmd did not run"]); return;
+	else: push_warning("INPUT: [%s] PROBLEM: [%s] RESULT: [%s]" % [cmd, "no valid funcname", "cmd did not run"]); cmdline.text += "!"; return;
 	
-	var get_params_funcname: String = "get_[%s]_params" % [funcname]
+	var get_params_funcname: String = "get_%s_params" % [funcname]
 	var params_tokens: PackedStringArray = cmd_tokens.slice(1)
 	var params: Array = call(get_params_funcname, params_tokens)
 	
-	if is_error(params): push_warning("INPUT: [%s] PROBLEM: [%s] RESULT: [%s]" % [cmd, params[1], "cmd did not run"]); return;
-	callv(funcname, params)
+	if is_error(params): push_warning("INPUT: [%s] PROBLEM: [%s] RESULT: [%s]" % [cmd, params[1], "cmd did not run"]); cmdline.text += "!"; return;
+	callv("cmd_%s" % [funcname], params)
 	clear_cmdline()
 	
 func clear_cmdline() -> void:
@@ -210,11 +217,12 @@ func access_cmd_history(idx_delta: int) -> void:
 		cmd_history_idx = cmd_history_idx + idx_delta
 	
 """
-COMMANDS
+COMMANDS: cmd_%s
 """
 
 func cmd_draw(tt: TerrainTypeColor, tm: TerrainModColor, mph: SpeedMPHColor, dir: DirectionColor, brush_csize: Vector2i = BRUSH_CSIZE) -> void:
-	var new_draw_struct: DrawStruct = draw_struct.create_empty()
+	var new_draw_struct: DrawStruct = DrawStruct.create_empty()
+	new_draw_struct.type = DrawStruct.DRAW
 	new_draw_struct.terrain_type_color = tt
 	new_draw_struct.terrain_mod_color = tm
 	new_draw_struct.speed_mph_color = mph
@@ -223,7 +231,8 @@ func cmd_draw(tt: TerrainTypeColor, tm: TerrainModColor, mph: SpeedMPHColor, dir
 	open_brush(new_draw_struct)
 	
 func cmd_erase(brush_csize: Vector2i = BRUSH_CSIZE) -> void:
-	var new_draw_struct: DrawStruct = draw_struct.create_empty()
+	var new_draw_struct: DrawStruct = DrawStruct.create_empty()
+	new_draw_struct.type = DrawStruct.ERASE
 	new_draw_struct.brush_csize = brush_csize
 	open_brush(new_draw_struct)
 	
@@ -237,7 +246,7 @@ func cmd_help() -> void:
 	pass
 	
 """
-COMMAND PARAMS
+COMMAND PARAMS: get_%s_params
 """
 	
 func get_draw_params(params_tokens: PackedStringArray) -> Array:
@@ -253,20 +262,28 @@ func get_draw_params(params_tokens: PackedStringArray) -> Array:
 		var paramname: String = extract_paramname(param_token)
 		if DRAW_PARAMS_MAP.has(paramname): paramname = DRAW_PARAMS_MAP[paramname][ACTUAL_PARAMNAME]
 		else: return make_error("no matching paramnames in DRAW_PARAMS_MAP [%s]" % [paramname])
-		
-		"extract_terrain_type_color"
+
 		match DRAW_PARAMS_MAP[paramname][PARAMNAME_TYPE]:
-			TTC: ttc = call("extract_[%s]" % [TTC], paramname)
-			TMC: tmc = call("extract_[%s]" % [TMC], paramname)
-			SMC: smc = call("extract_[%s]" % [SMC], extract_param_group(param_token)) 
-			DIC: dic = call("extract_[%s]" % [DIC], extract_param_group(param_token))
-			BSH: bsh = call("extract_[%s]" % [BSH], extract_param_group(param_token)) 
+			TTC: ttc = call("extract_%s" % [TTC], paramname)
+			TMC: tmc = call("extract_%s" % [TMC], paramname)
+			SMC: smc = call("extract_%s" % [SMC], extract_param_group(param_token)) 
+			DIC: dic = call("extract_%s" % [DIC], extract_param_group(param_token))
+			BSH: bsh = call("extract_%s" % [BSH], extract_param_group(param_token)) 
 			
 	return [ttc,tmc,smc,dic,bsh]
 	
-func get_erase_params() -> Array:
-	# next.
-	return []
+func get_erase_params(params_tokens: PackedStringArray) -> Array:
+	#allowed to specify brush()
+	var bsh: Vector2i = BRUSH_CSIZE
+	for param_token in params_tokens:
+		var paramname: String = extract_paramname(param_token)
+		if ERASE_PARAMS_MAP.has(paramname): paramname = ERASE_PARAMS_MAP[paramname][ACTUAL_PARAMNAME]
+		else: return make_error("no matching paramnames in ERASE_PARAMS_MAP [%s]" % [paramname])
+		
+		match ERASE_PARAMS_MAP[paramname][PARAMNAME_TYPE]:
+			BSH: bsh = call("extract_%s" % [BSH], extract_param_group(param_token))  
+	
+	return [bsh]
 	
 """
 ERRORS RESOURCES
@@ -274,7 +291,8 @@ ERRORS RESOURCES
 
 func is_error(check_array: Array) -> bool:
 	# checks to see if the first item in the array is ERROR
-	if check_array[0] == ERROR: return true
+	
+	if check_array[0] is String and check_array[0] == ERROR: return true
 	return false
 	
 func make_error(problem_description: String = "") -> Array[String]:
