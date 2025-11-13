@@ -17,32 +17,46 @@ class_name Utils
 	#dir = str_arr[1]
 	#return VelocityColor.create(speed_mph, dir)
 		
-static func group_to_string_array(group: String) -> PackedStringArray:
-	# FORMAT "possibletext(Value, Value, ...)"
-	# ex: text(100) -> Array["100"]
-	# ex: text(100, ne)  -> Array["100", "100"]
-	# ex: (100, 100, 1000) -> Array["100", "100", "1000"]
+#static func group_to_string_array(group: String) -> PackedStringArray:
+	## FORMAT "possibletext(Value, Value, ...)"
+	## ex: text(100) -> Array["100"]
+	## ex: text(100, ne)  -> Array["100", "100"]
+	## ex: (100, 100, 1000) -> Array["100", "100", "1000"]
+#
+	#var start_idx = group.find("(")
+	#var end_idx = group.rfind(")")
+#
+	#if start_idx == -1 or end_idx == -1 or end_idx <= start_idx:
+		#push_error("USER INPUT ERROR: Missing or malformed parentheses in input: " + group)
+		#return PackedStringArray()
+#
+	## Extract inside parentheses
+	#var s = group.substr(start_idx + 1, end_idx - start_idx - 1).strip_edges()
+#
+	## Split by commas
+	#var parts: PackedStringArray = s.split(",")
+#
+	## Trim whitespace on each part
+	#for i in parts.size():
+		#parts[i] = parts[i].strip_edges()
+#
+	#return parts
+	#
+### COLORS
 
-	var start_idx = group.find("(")
-	var end_idx = group.rfind(")")
-
-	if start_idx == -1 or end_idx == -1 or end_idx <= start_idx:
-		push_error("USER INPUT ERROR: Missing or malformed parentheses in input: " + group)
-		return PackedStringArray()
-
-	# Extract inside parentheses
-	var s = group.substr(start_idx + 1, end_idx - start_idx - 1).strip_edges()
-
-	# Split by commas
-	var parts: PackedStringArray = s.split(",")
-
-	# Trim whitespace on each part
-	for i in parts.size():
-		parts[i] = parts[i].strip_edges()
-
-	return parts
-	
-## COLORS
+static func combine_bit_strs(bit_strs: Array[String]) -> String:
+	#assumes bit_strs are all of the same size
+	# ex: 00110010
+	#     01010101
+	#     10000000
+	# ->  11110111
+	var num: int = bit_strs.size()
+	var len: int = bit_strs[0].length()
+	var result: String = ""
+	for i in len:
+		result += "0"
+		for n in num: if bit_strs[n][i] == "1": result[i] == "1"; break;
+	return result
 
 static func ivec4_to_rgba8(ivec4: Vector4i) -> Color:
 	#rgba8: represents ints from 0 -> 255

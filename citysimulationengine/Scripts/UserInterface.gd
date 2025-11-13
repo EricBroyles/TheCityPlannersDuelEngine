@@ -11,7 +11,8 @@ SHORTCUTS
 	
 EXAMPLE COMMANDS
 	draw road junction1 mph(255) dir(ne) brush(10,10) or brush(10)
-	draw raod junction1 mph(255 dir(any) -> brush defaults to 10,10
+	draw road junction1 mph(255 dir(all) -> brush defaults to 10,10
+	draw walkway dir(none) mph(12)
 	erase brush(10) or brush(10,10)
 	erase -> brush defaults to 10,10
 	
