@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=4 uid="uid://dbvl5vfe620q"]
+[gd_scene load_steps=27 format=4 uid="uid://dbvl5vfe620q"]
 
 [ext_resource type="Script" uid="uid://6i2s4kjbc3x2" path="res://Scripts/UserInterface.gd" id="1_r150o"]
 [ext_resource type="Script" uid="uid://biimumy7jo6r7" path="res://Scripts/World.gd" id="2_kln2b"]
@@ -12,6 +12,8 @@
 [ext_resource type="Shader" uid="uid://cft1qxy0ih5fl" path="res://Shaders/direction.gdshader" id="6_vy5pj"]
 [ext_resource type="Texture2D" uid="uid://b8tgcdcpex523" path="res://Assets/Junction2.svg" id="7_frkhe"]
 [ext_resource type="Texture2D" uid="uid://nnt3op80wcjh" path="res://Assets/JunctionStop.svg" id="9_1p5hy"]
+[ext_resource type="Texture2D" uid="uid://b3ltyxskq0dmq" path="res://Assets/E_Arrow.png" id="12_1p5hy"]
+[ext_resource type="Texture2D" uid="uid://3ua1raf3ru21" path="res://Assets/NE_Arrow.png" id="13_h1m7h"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_idj7w"]
 bg_color = Color(0, 0, 0, 1)
@@ -58,6 +60,10 @@ shader_parameter/px_position = Vector2(0, 0)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1p5hy"]
 shader = ExtResource("6_vy5pj")
+shader_parameter/e_arrow = ExtResource("12_1p5hy")
+shader_parameter/ne_arrow = ExtResource("13_h1m7h")
+shader_parameter/px_per_cell = 0.0
+shader_parameter/px_position = Vector2(0, 0)
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_h1m7h"]
 
@@ -145,7 +151,6 @@ texture = SubResource("CanvasTexture_frkhe")
 
 [node name="Direction" type="TextureRect" parent="World"]
 unique_name_in_owner = true
-visible = false
 material = SubResource("ShaderMaterial_1p5hy")
 anchors_preset = 15
 anchor_right = 1.0

@@ -51,11 +51,11 @@ static func combine_bit_strs(bit_strs: PackedStringArray) -> String:
 	#     10000000
 	# ->  11110111
 	var num: int = bit_strs.size()
-	var len: int = bit_strs[0].length()
+	var length: int = bit_strs[0].length()
 	var result: String = ""
-	for i in len:
+	for i in length:
 		result += "0"
-		for n in num: if bit_strs[n][i] == "1": result[i] == "1"; break;
+		for n in num: if bit_strs[n][i] == "1": result[i] = "1"; break;
 	return result
 
 static func ivec4_to_rgba8(ivec4: Vector4i) -> Color:

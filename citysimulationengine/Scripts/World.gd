@@ -37,7 +37,7 @@ func _ready() -> void:
 	terrain_type.material.set_shader_parameter("world_data_tex", terrain_type_tex)
 	terrain_mod.material.set_shader_parameter("world_data_tex", terrain_mod_tex)
 	speed_mph.material.set_shader_parameter("world_data_tex", speed_mph_tex)
-
+	direction.material.set_shader_parameter("world_data_tex", direction_tex)
 	update_view()
 	
 func _process(_delta: float) -> void:
@@ -59,6 +59,8 @@ func update_view() -> void:
 	terrain_mod.material.set_shader_parameter("px_position", px)
 	speed_mph.material.set_shader_parameter("px_per_cell", px_per_cell)
 	speed_mph.material.set_shader_parameter("px_position", px)
+	direction.material.set_shader_parameter("px_per_cell", px_per_cell)
+	direction.material.set_shader_parameter("px_position", px)
 	
 func move_view(by_px: Vector2i) -> void:
 	px += by_px
@@ -124,42 +126,42 @@ func _draw_to_img(img: Image, tex: ImageTexture, world_cell_rect: Rect2i, c: Col
 
 	
 	
-func create_gradient_random_image(w: int, h: int) -> Image:
-	var start_time = Time.get_ticks_msec()
-	var img: Image = Image.create(w, h, false, Image.FORMAT_RGBA8)
-
-	var color1 = Color.AQUA
-	var color2 = Color.CORAL
-
-	# Center of the image
-	var center_x = w / 2.0
-	var center_y = h / 2.0
-	var max_dist = sqrt(center_x * center_x + center_y * center_y)
-
-	for y in range(h):
-		for x in range(w):
-			var use_color1 = ((x + y) % 2 == 0)
-			var base_color = color1 if use_color1 else color2
-
-			# Compute distance to center and normalize it between 0 and 1
-			var dx = x - center_x
-			var dy = y - center_y
-			var dist = sqrt(dx * dx + dy * dy) / max_dist
-
-			# Invert distance so closer to center = darker
-			var brightness = dist  # far = 1, near = 0
-			var dark_factor = lerp(0, 1, brightness)  # 0.4 = darkest center, 1.0 = edge
-
-			# Apply darkening
-			var darker_color = Color(
-				base_color.r * dark_factor,
-				base_color.g * dark_factor,
-				base_color.b * dark_factor,
-				1.0
-			)
-
-			img.set_pixel(x, y, darker_color)
-
-	var end_time = Time.get_ticks_msec()
-	print("Generated in %s ms" % (end_time - start_time))
-	return img
+#func create_gradient_random_image(w: int, h: int) -> Image:
+	#var start_time = Time.get_ticks_msec()
+	#var img: Image = Image.create(w, h, false, Image.FORMAT_RGBA8)
+#
+	#var color1 = Color.AQUA
+	#var color2 = Color.CORAL
+#
+	## Center of the image
+	#var center_x = w / 2.0
+	#var center_y = h / 2.0
+	#var max_dist = sqrt(center_x * center_x + center_y * center_y)
+#
+	#for y in range(h):
+		#for x in range(w):
+			#var use_color1 = ((x + y) % 2 == 0)
+			#var base_color = color1 if use_color1 else color2
+#
+			## Compute distance to center and normalize it between 0 and 1
+			#var dx = x - center_x
+			#var dy = y - center_y
+			#var dist = sqrt(dx * dx + dy * dy) / max_dist
+#
+			## Invert distance so closer to center = darker
+			#var brightness = dist  # far = 1, near = 0
+			#var dark_factor = lerp(0, 1, brightness)  # 0.4 = darkest center, 1.0 = edge
+#
+			## Apply darkening
+			#var darker_color = Color(
+				#base_color.r * dark_factor,
+				#base_color.g * dark_factor,
+				#base_color.b * dark_factor,
+				#1.0
+			#)
+#
+			#img.set_pixel(x, y, darker_color)
+#
+	#var end_time = Time.get_ticks_msec()
+	#print("Generated in %s ms" % (end_time - start_time))
+	#return img
