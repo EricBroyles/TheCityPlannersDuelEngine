@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://swnl3xb5qdnh"]
+
+[ext_resource type="Script" uid="uid://dlkkln85sitiy" path="res://Scripts/TestConnectivityMatrix.gd" id="1_g11e7"]
+[ext_resource type="Shader" uid="uid://e0u54fxppdsu" path="res://Shaders/connectivity_matrix.gdshader" id="2_jidxe"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3qjxd"]
+shader = ExtResource("2_jidxe")
+shader_parameter/size = Vector2i(0, 0)
+
+[node name="TestConnectivityMatrix" type="Node2D"]
+script = ExtResource("1_g11e7")
+
+[node name="InitialCM" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+
+[node name="CurrentCM" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+
+[node name="SubViewport" type="SubViewport" parent="."]
+unique_name_in_owner = true
+disable_3d = true
+size = Vector2i(10, 10)
+
+[node name="ProcessCM" type="Sprite2D" parent="SubViewport"]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_3qjxd")

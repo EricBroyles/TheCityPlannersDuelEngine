@@ -10,7 +10,7 @@ uniform vec2 px_position;
 void fragment() {
     // Compute cell index
     vec2 cell_idx = floor((px_position + FRAGCOORD.xy) / px_per_cell);
-    ivec2 tex_size = textureSize(world_data_tex, 0);
+    ivec2 tex_size = textureSize(world_data_tex, 0); //warning this assumes square!
     vec2 cell_uv = cell_idx / vec2(tex_size);
 
     // Decode terrain type

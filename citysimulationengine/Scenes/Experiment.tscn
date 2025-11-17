@@ -1,7 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://gxvjhp7oxbwx"]
+[gd_scene load_steps=10 format=3 uid="uid://gxvjhp7oxbwx"]
 
 [ext_resource type="Script" uid="uid://cy83nu4d8susj" path="res://Scripts/Experiment.gd" id="1_vovyc"]
 [ext_resource type="Shader" uid="uid://dxfm7twg68rd4" path="res://Shaders/_experiment_sampler2d_datasize.gdshader" id="2_gjcfw"]
+[ext_resource type="Shader" uid="uid://blt7lebaadhqs" path="res://Shaders/experiment_shader_COLOR_write.gdshader" id="3_gjcfw"]
+[ext_resource type="Texture2D" uid="uid://dhjmq8f48hm75" path="res://Assets/Experiment_Detect_Black_px.png" id="4_fo4tq"]
+[ext_resource type="Shader" uid="uid://jdwlihmn6ggt" path="res://Shaders/experiment_detect_single_black_px.gdshader" id="5_7r2dr"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mwlpf"]
 shader = ExtResource("2_gjcfw")
@@ -9,6 +12,13 @@ shader_parameter/my_num = 0
 shader_parameter/conversion = 0.0
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_fo4tq"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fo4tq"]
+shader = ExtResource("3_gjcfw")
+shader_parameter/num = 255.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_na5va"]
+shader = ExtResource("5_7r2dr")
 
 [node name="Experiment" type="Node2D"]
 script = ExtResource("1_vovyc")
@@ -21,3 +31,32 @@ offset_top = 280.0
 offset_right = 553.0
 offset_bottom = 320.0
 texture = SubResource("CanvasTexture_fo4tq")
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+unique_name_in_owner = true
+handle_input_locally = false
+render_target_update_mode = 4
+
+[node name="ColorRect" type="ColorRect" parent="SubViewportContainer/SubViewport"]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_fo4tq")
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+offset_left = 132.0
+offset_top = 468.0
+offset_right = 232.0
+offset_bottom = 568.0
+texture = ExtResource("4_fo4tq")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_na5va")
+offset_left = 266.0
+offset_top = 491.0
+offset_right = 306.0
+offset_bottom = 531.0

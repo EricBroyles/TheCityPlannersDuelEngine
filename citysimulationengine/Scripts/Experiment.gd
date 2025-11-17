@@ -37,6 +37,8 @@ var rgba32_img: Image = Image.create(1,1,false,Image.FORMAT_RGBAF) #each channel
 var my_num: int =  1
 
 @onready var text_rect: TextureRect = %TextureRect
+@onready var sub_viewport: SubViewport = %SubViewport
+@onready var color_rect: ColorRect = %ColorRect
 
 func _ready() -> void:
 	var n: float = 4294967294 / 4294967295.0
@@ -74,4 +76,13 @@ func pack32_to_rgba(v:int) -> Color:
 		float((v >> 8) & 0xFF) / 255.0,
 		float(v & 0xFF) / 255.0
 	)
+	
+func _process(delta: float) -> void:
+	#.get_texture().get_image()
+	print(sub_viewport.get_viewport().get_texture().get_image().get_pixel(0,0).r)
+	print(sub_viewport.get_viewport().get_texture().get_image().get_pixel(0,0).r * 255.0)
+	pass
+	#print(text_rect.texture.get_image().get_pixel(0,0))
+	
+	#print(color_rect.material.)
 	
