@@ -50,13 +50,11 @@ uniform uvec2 size;
 
 const uint GROUP_ID_BITS = 30u;
 
-// I need to:
-// set the color at each px with lowest valid group id, delta if it changed, barrier
+const ivec2 TL_CELL_SHIFT = ivec2(-1,-1); //(c,r) + shift == top left cell
+const ivec2  T_CELL_SHIFT = ivec2(+0,-1);
+const ivec2 TR_CELL_SHIFT = ivec2(+1,-1);
+const ivec2  L_CELL_SHIFT = ivec2(-1,+0);
 
-// get the raw value in cm0, scale it to 255, read_cm0
-// goal 
-// get group id at upper left (t/f if it is allowed)
-// get group id at upper right (t/f)
 
 uint extract_group_id(uvec4 px_255) {
 	//px_255 = (xxxxxxxx) (yyyyyyyy) (zzzzzzzz) (wwwwwwDB)
@@ -107,18 +105,238 @@ vec4 pack_cm1(uvec3 cm_px_struct) {
 	return vec4(r,g,b,a);
 }
 
+uvec2 extract_idx(uint group_id) {
+	/*
+	IN: group_id == rowwise_idx 
+	OUT: uvec2(col, row)
+	Assumes: group_id is valid
+	*/
+	uint width = size.x;
+	uint row = group_id / width;
+	uint col = group_id % width;
+	return uvec2(col, row);
+}
+
+bool in_lower_bounds(ivec2 idx) {
+	return bool(idx.x >= 0 && idx.y >= 0);
+}
+
+bool in_upper_bounds(ivec2 idx) {
+	return bool(idx.x < int(size.x) && idx.y < int(size.y));
+}
+
+bool nw_dir_allowed(vec2 uv) {
+	// Top Left
+	return (uint(texture(dir, uv).r * 255.0) & 8u) != 0u;
+}
+
+bool n_dir_allowed(vec2 uv) {
+	// Top
+	return (uint(texture(dir, uv).r * 255.0) & 4u) != 0u;
+}
+
+bool ne_dir_allowed(vec2 uv) {
+	// Top Right
+	return (uint(texture(dir, uv).r * 255.0) & 2u) != 0u;
+}
+
+bool w_dir_allowed(vec2 uv) {
+	// Left
+	return (uint(texture(dir, uv).r * 255.0) & 16u) != 0u;
+}
+
+vec2 idx_to_uv(ivec2 idx) {
+	return vec2(idx) / (vec2(size) - vec2(1,1));
+}
+
+uvec2 tl_search_at(uint group_id) {
+	/*
+	Top left relative search at group_id == rowwise idx
+	IN:  the group_id -> rowwise_idx -> uv to search relative to (in cm0 and dir)
+	OUT: uvec2(success|failure, tl_group_id|group_id)
+	Failure Conditions:
+	* Top left cell relative to group_id is in lower bounds. (dont need to check upper bounds)
+	* Top left cell relative to group_id is a barrier
+	* Top left cell relative to group_id is not allowed to move to via dir
+	*/
+	
+	ivec2 idx = ivec2(extract_idx(group_id));
+	ivec2 tl_idx = idx + TL_CELL_SHIFT;
+	if (!in_lower_bounds(tl_idx)) {return uvec2(uint(false), group_id);}
+	
+	vec2 uv = idx_to_uv(idx); // can current group_id move nw
+	if (!nw_dir_allowed(uv)) 	  {return uvec2(uint(false), group_id);}
+	
+	vec2 tl_uv = idx_to_uv(tl_idx);
+	uvec3 cm_px_struct = read_cm0(tl_uv);
+	bool barrier = bool(cm_px_struct.z);
+	if (barrier) 				  {return uvec2(uint(false), group_id);}
+	
+	uint tl_group_id = cm_px_struct.x;
+	return uvec2(uint(true), tl_group_id);
+}
+
+uvec2 t_search_at(uint group_id) {
+	/*
+	Top relative search at group_id == rowwise idx
+	*/
+	ivec2 idx = ivec2(extract_idx(group_id));
+	ivec2 t_idx = idx + T_CELL_SHIFT;
+	if (!in_lower_bounds(t_idx)) {return uvec2(uint(false), group_id);}
+	
+	vec2 uv = idx_to_uv(idx); // can current group_id move n
+	if (!n_dir_allowed(uv)) 	  {return uvec2(uint(false), group_id);}
+	
+	vec2 t_uv = idx_to_uv(t_idx);
+	uvec3 cm_px_struct = read_cm0(t_uv);
+	bool barrier = bool(cm_px_struct.z);
+	if (barrier) 				  {return uvec2(uint(false), group_id);}
+	
+	uint t_group_id = cm_px_struct.x;
+	return uvec2(uint(true), t_group_id);
+}
+
+uvec2 tr_search_at(uint group_id) {
+	/*
+	Top right relative search at group_id == rowwise idx
+	(This needs to check th eupper bounds)
+	*/
+	ivec2 idx = ivec2(extract_idx(group_id));
+	ivec2 tr_idx = idx + TR_CELL_SHIFT;
+	if (!in_lower_bounds(tr_idx) || !in_upper_bounds(tr_idx)) {return uvec2(uint(false), group_id);}
+	
+	vec2 uv = idx_to_uv(idx); // can current group_id move ne
+	if (!ne_dir_allowed(uv)) 	  {return uvec2(uint(false), group_id);}
+	
+	vec2 tr_uv = idx_to_uv(tr_idx);
+	uvec3 cm_px_struct = read_cm0(tr_uv);
+	bool barrier = bool(cm_px_struct.z);
+	if (barrier) 				  {return uvec2(uint(false), group_id);}
+	
+	uint tr_group_id = cm_px_struct.x;
+	return uvec2(uint(true), tr_group_id);
+}
+
+uvec2 l_search_at(uint group_id) {
+	/*
+	Left relative search at group_id == rowwise idx
+	*/
+	ivec2 idx = ivec2(extract_idx(group_id));
+	ivec2 l_idx = idx + L_CELL_SHIFT;
+	if (!in_lower_bounds(l_idx)) {return uvec2(uint(false), group_id);}
+	
+	vec2 uv = idx_to_uv(idx); // can current group_id move n
+	if (!w_dir_allowed(uv)) 	  {return uvec2(uint(false), group_id);}
+	
+	vec2 l_uv = idx_to_uv(l_idx);
+	uvec3 cm_px_struct = read_cm0(l_uv);
+	bool barrier = bool(cm_px_struct.z);
+	if (barrier) 				  {return uvec2(uint(false), group_id);}
+	
+	uint l_group_id = cm_px_struct.x;
+	return uvec2(uint(true), l_group_id);
+}
 
 void fragment() {
 	
 	uvec3 cm_px_struct = read_cm0(UV);
+	uint group_id = cm_px_struct.x;
+	bool delta = bool(cm_px_struct.y); // Did this px change last iteration.
+	bool barrier = bool(cm_px_struct.z);
+	
+	uint new_group_id = group_id;
+	bool new_delta = false; // Did this px change this iteration.
+	
+	if (!barrier && delta) {
+		
+		// Top Left
+		uvec2 tl_search_results = tl_search_at(group_id);
+		bool did_find = bool(tl_search_results.x);
+		if (did_find) {new_group_id = tl_search_results.y; new_delta = true;}
+		
+		// Top
+		if (!new_delta) {
+			uvec2 t_search_results = t_search_at(group_id);
+			bool did_find = bool(t_search_results.x);
+			if (did_find) {new_group_id = t_search_results.y; new_delta = true;}
+		}
+		// Top Right
+		if (!new_delta) {
+			uvec2 tr_search_results = tr_search_at(group_id);
+			bool did_find = bool(tr_search_results.x);
+			if (did_find) {new_group_id = tr_search_results.y; new_delta = true;}
+		}
+		// Left
+		if (!new_delta) {
+			uvec2 l_search_results = l_search_at(group_id);
+			bool did_find = bool(l_search_results.x);
+			if (did_find) {new_group_id = l_search_results.y; new_delta = true;}
+		}
+		
+	}
+	
+	cm_px_struct.x = new_group_id;
+	cm_px_struct.y = uint(new_delta);
 	COLOR = pack_cm1(cm_px_struct);
-	
-	
-	
-	
-	//if delta is false or barrier is true leave the cell as is
-	
-	
+}
+
+
+
+/*
+SOme Tests
+*/
+
+//void fragment() {
+	//// Test tl_search
+	//
+	////uvec2 res = tl_search_at(0);
+	////uvec2 ans = uvec2(0,0); //false, group_id = 0
+	//
+	////uvec2 res = tl_search_at(1);
+	////uvec2 ans = uvec2(0,1); //false, group_id = 1
+	//
+	////uvec2 res = tl_search_at(10);
+	////uvec2 ans = uvec2(0,10); //true, group_id = 10
+	//
+	////uvec2 res = tl_search_at(11);
+	////uvec2 ans = uvec2(1,0); //true, group_id = 0 (found 0 in tl)
+	//
+	////uvec2 res = tl_search_at(12); 
+	////uvec2 ans = uvec2(1,1); //true, group_id = 1 (found 1 in tl)
+	////
+	////if (res == ans) {
+		////COLOR = vec4(1);
+	////}
+	////else {
+		////COLOR = vec4(0);
+	////}
+	//
+	//
+	//
+	////// test dir allowed
+	////if (nw_dir_allowed(UV)) {
+		////COLOR = vec4(1);
+	////}
+	////else {
+		////COLOR = vec4(0);
+	////}
+	//
+	////// Check extract idx 
+	////uvec2 idx = extract_idx(12);
+	////if (idx == uvec2(2,1)) {
+		////COLOR = vec4(1);
+	////}
+	////else {
+		////COLOR = vec4(0);
+	////}
+//}
+
+
+/*
+FOR FURTURE REFERENCE
+
+*/
+
 	//uvec3 cm_px_struct = read_cm0(UV); //uvec3(group_id, delta, barrier)
 	//if (cm_px_struct.x == 0u){
 		//COLOR = vec4(1,1,1,1);
@@ -138,10 +356,6 @@ void fragment() {
 	//else {
 		//COLOR = vec4(0,0,0,0);
 	//}
-
-
-}
-
 
 
 

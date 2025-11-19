@@ -1,3 +1,9 @@
+/*
+0  0 0  0 0  0 0  0
+se s sw w nw n ne e
+
+*/
+
 shader_type canvas_item;
 render_mode unshaded;
 
@@ -7,6 +13,7 @@ uniform sampler2D ne_arrow: source_color, filter_nearest, repeat_disable; // bla
 uniform sampler2D world_data_tex : source_color, filter_nearest, repeat_disable;
 uniform float px_per_cell;
 uniform vec2 px_position;
+
 
 vec2 rotate_uv_90_ccw(vec2 uv, int rotations) {
     rotations = rotations % 4;

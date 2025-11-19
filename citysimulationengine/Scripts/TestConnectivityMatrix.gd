@@ -23,6 +23,13 @@ func _input(_event: InputEvent) -> void:
 		for r in init_cm.get_height():
 			for c in init_cm.get_width():
 				print("cm0: ", init_cm.get_pixel(c,r) * 255.0, " | cm1: ", cm1.get_pixel(c,r) * 255.0)
+				
+		#convert each number into its group_id
+		print()
+		print_grid(init_cm, cm1)
+			
+		
+		
 		
 	elif Input.is_action_just_pressed("escape"):
 		# send information to shader again
@@ -83,6 +90,32 @@ func pack_pixel(idx: int, delta: bool, barrier: bool) -> Color:
 	# Convert to 0–1 range for Color
 	return Color(r / 255.0, g / 255.0, b / 255.0, a / 255.0)
 	
+func extract_group_id(color: Color) -> int:
+	# Convert 0–1 floats into 8-bit ints
+	var r: int = int(color.r * 255.0)
+	var g: int = int(color.g * 255.0)
+	var b: int = int(color.b * 255.0)
+	var a: int = int(color.a * 255.0)
+	
+	# Reassemble the 32-bit packed integer
+	var packed: int = (r << 24) | (g << 16) | (b << 8) | a
+
+	# Remove the delta and barrier bits
+	var idx_30bit: int = packed >> 2
+
+	return idx_30bit
+	
+func print_grid(init_cm: Image, cm1: Image) -> void:
+	var w := init_cm.get_width()
+	var h := init_cm.get_height()
+
+	for r in h:
+		var s := ""
+		for c in w:
+			var a := str(extract_group_id(init_cm.get_pixel(c, r))).lpad(3)
+			var b := str(extract_group_id(cm1.get_pixel(c, r))).lpad(3)
+			s += "(%s,%s) " % [a, b]
+		print(s)
 
 
 
