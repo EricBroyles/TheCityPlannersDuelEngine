@@ -17,12 +17,13 @@ var iteration: int = 0
 
 
 # Tests:
-# Size(10,10), Dir = All, Barrier = NONE -> should converge to all group_id = 0
-# Size(10,10), DIR = NONE, Barrier = NONE -> should not change at all
-# SIZE(10,10), DIR = ALL, BArrier = ALL -> should not change at all
-# SIZE(10,10), DIR = ALL, BARRIER = split into 4 quadrents (one row and one col as barrier)-> expect 4 groups
-# SIZE(10,10), DIR = N ONLY, BARRIER = NONE -> expect 10 vertical groups
-# SIZE(10,10), DIR = S ONLY, BARRIER = NONE -> expect 10 vertical groups
+# (PASS) Size(10,10), Dir = All, Barrier = NONE -> should converge to all group_id = 0 
+# (PASS) Size(10,10), DIR = NONE, Barrier = NONE -> should not change at all 
+# (PASS) SIZE(10,10), DIR = ALL, BArrier = ALL -> should not change at all
+# (PASS) SIZE(10,10), DIR = ALL, BARRIER = split into 4 quadrents (one row and one col as barrier)-> expect 4 groups
+# (PASS) SIZE(10,10), DIR = N ONLY, BARRIER = NONE -> expect 10 vertical groups
+# (PASS) SIZE(10,10), DIR = S ONLY, BARRIER = NONE -> expect 10 vertical groups
+
 # SIZE(10,10), DIR = E ONLY, BARRIER = split into 4 quadrents (one row and one col as barrier) -> expect 18 groups arrranged horizontally divided by quadrents
 # LOOP: SIZE(10,10), DIR = LOOP using N,E,W,S BARRIER = center is barrier -> expect one group at outer edges
 # TRAFFIC CIRCLE: SIZE(10,10), loop at the center and 4 roads connnecting -> expect one group representing the traffic circle. 
@@ -30,14 +31,78 @@ var iteration: int = 0
 
 
 func _ready() -> void:
-	# Test 1
+	## (PASS) Test 1: Expect all group_id = 0
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "all"
+	#var barrier: bool = false
+	#fill_dir(size, dir_option)
+	#fill_cm0(size, barrier)
+	
+	## (PASS) Test 2: Expect no change
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "none"
+	#var barrier: bool = false
+	#fill_dir(size, dir_option)
+	#fill_cm0(size, barrier)
+	#
+	## (PASS) Test 3: Expect no change
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "all"
+	#var barrier: bool = true
+	#fill_dir(size, dir_option)
+	#fill_cm0(size, barrier)
+	
+	## (PASS) Test 4: Expect 4 groups in each corner sperated by barriers
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "all"
+	#var dividers_col: Array[int] = [4]
+	#var dividers_row: Array[int] = [5]
+	#fill_dir(size, dir_option)
+	#fill_cm0_with_dividers(size, dividers_col, dividers_row)
+	
+	## (PASS) Test 5: Expect 10 vertical groups
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "n"
+	#var multi_dir: bool = false
+	#var barrier: bool = false
+	#fill_dir(size, dir_option, multi_dir)
+	#fill_cm0(size, barrier)
+	
+	## (PASS) Test 6: Expect 10 vertical groups
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "s"
+	#var multi_dir: bool = false
+	#var barrier: bool = false
+	#fill_dir(size, dir_option, multi_dir)
+	#fill_cm0(size, barrier)
+	
+	## (PASS) Test 7: Expect 10 horizontal groups
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "e"
+	#var multi_dir: bool = false
+	#var barrier: bool = false
+	#fill_dir(size, dir_option, multi_dir)
+	#fill_cm0(size, barrier)
+	
+	## (PASS) Test 8: Expect 10 horizontal groups
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "w"
+	#var multi_dir: bool = false
+	#var barrier: bool = false
+	#fill_dir(size, dir_option, multi_dir)
+	#fill_cm0(size, barrier)
+	
+	## () Test 9: 1 + 2(L-1) diagonal groups where L is the Lenght of the square (so 19 for L = 10)
 	var size: Vector2i = Vector2i(10,10)
-	var dir_option: String = "all"
+	var dir_option: String = "nw"
+	var multi_dir: bool = false
 	var barrier: bool = false
-	fill_dir(size, "all")
+	fill_dir(size, dir_option, multi_dir)
 	fill_cm0(size, barrier)
-
-
+	
+	#try it with ne, and nw, se, sw
+	
+	
 	# Needed for all Tests
 	process_cm.material.set_shader_parameter("dir", dir_tex)
 	process_cm.material.set_shader_parameter("size", cm0_tex.get_size())
@@ -110,19 +175,42 @@ func capture_cm1() -> void:
 	cm1_img = cm1
 	cm1_tex = ImageTexture.create_from_image(cm1)
 
-func fill_dir(size: Vector2i, dir_option: String) -> void:
+func fill_dir(size: Vector2i, dir_option: String, multi_dir = true) -> void:
 	var dir: Image = Image.create_empty(size.x, size.y, false, DirectionColor.IMAGE_FORMAT)
-	dir.fill(DirectionColor.string_create(dir_option).get_color())
+	dir.fill(DirectionColor.string_create(dir_option, multi_dir).get_color())
 	dir_tex = ImageTexture.create_from_image(dir)
 	
-func fill_cm0(size: Vector2i, barrier: bool) -> void:
+func _simple_fill_cm0(size: Vector2i, delta: bool, barrier: bool) -> Image:
 	var cm0: Image = Image.create_empty(size.x, size.y, false, Image.FORMAT_RGBA8)
-	var delta: bool = true
 	for r in size.y:
 		for c in size.x:
 			var rowwise_idx: int = r * size.x + c     # r,c → rowwise index
 			var clr: Color = pack_pixel(rowwise_idx,delta,barrier)
 			cm0.set_pixel(c,r,clr)
+	return cm0
+	
+func fill_cm0(size: Vector2i, barrier: bool) -> void:
+	var delta: bool = true
+	var cm0: Image = _simple_fill_cm0(size, delta, barrier)
+	init_cm0_img = cm0
+	cm0_tex = ImageTexture.create_from_image(cm0)
+	
+func fill_cm0_with_dividers(size: Vector2i, dividers_col: Array[int], dividers_row: Array[int]) -> void:
+	## WARNING: this has all barriers not have a normal rowwise idx, instead they use 0 as their idx.
+	## 			this should not be a problem as the idx for anything labeled as barrier does not matter
+	
+	var cm0: Image = _simple_fill_cm0(size, true, false)
+	var delta: bool = true
+	for col_idx in dividers_col:
+		var x: int = col_idx; var y: int = 0
+		var w: int = 1;       var h: int = size.y
+		cm0.fill_rect(Rect2i(x,y,w,h), pack_pixel(0, true, true))
+		
+	for row_idx in dividers_row:
+		var y: int = row_idx; var x: int = 0
+		var h: int = 1;       var w: int = size.x
+		cm0.fill_rect(Rect2i(x,y,w,h), pack_pixel(0, true, true))
+		
 	init_cm0_img = cm0
 	cm0_tex = ImageTexture.create_from_image(cm0)
 	

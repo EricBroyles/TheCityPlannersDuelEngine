@@ -1,4 +1,6 @@
 /*
+NOTE: the idx given for a barrier does not matter
+
 Direction Matrix: dir
 	- IMAGE: R8
 	- SIZE: RxC
@@ -125,14 +127,9 @@ bool in_upper_bounds(ivec2 idx) {
 	return bool(idx.x < int(size.x) && idx.y < int(size.y));
 }
 
-bool nw_dir_allowed(vec2 uv) {
-	// Top Left
-	return (uint(texture(dir, uv).r * 255.0) & 8u) != 0u;
-}
-
-bool n_dir_allowed(vec2 uv) {
-	// Top
-	return (uint(texture(dir, uv).r * 255.0) & 4u) != 0u;
+bool e_dir_allowed(vec2 uv) {
+	// Right
+	return (uint(texture(dir, uv).r * 255.0) & 1u) != 0u;
 }
 
 bool ne_dir_allowed(vec2 uv) {
@@ -140,9 +137,34 @@ bool ne_dir_allowed(vec2 uv) {
 	return (uint(texture(dir, uv).r * 255.0) & 2u) != 0u;
 }
 
+bool n_dir_allowed(vec2 uv) {
+	// Top
+	return (uint(texture(dir, uv).r * 255.0) & 4u) != 0u;
+}
+
+bool nw_dir_allowed(vec2 uv) {
+	// Top Left
+	return (uint(texture(dir, uv).r * 255.0) & 8u) != 0u;
+}
+
 bool w_dir_allowed(vec2 uv) {
 	// Left
 	return (uint(texture(dir, uv).r * 255.0) & 16u) != 0u;
+}
+
+bool sw_dir_allowed(vec2 uv) {
+	// Bottom Left
+	return (uint(texture(dir, uv).r * 255.0) & 32u) != 0u;
+}
+
+bool s_dir_allowed(vec2 uv) {
+	// Bottom 
+	return (uint(texture(dir, uv).r * 255.0) & 64u) != 0u;
+}
+
+bool se_dir_allowed(vec2 uv) {
+	// Bottom Right
+	return (uint(texture(dir, uv).r * 255.0) & 128u) != 0u;
 }
 
 vec2 idx_to_uv(ivec2 idx) {
@@ -162,15 +184,15 @@ uvec2 tl_search_at(uint group_id) {
 	
 	ivec2 idx = ivec2(extract_idx(group_id));
 	ivec2 tl_idx = idx + TL_CELL_SHIFT;
-	if (!in_lower_bounds(tl_idx)) {return uvec2(uint(false), group_id);}
+	if (!in_lower_bounds(tl_idx)) 						  {return uvec2(uint(false), group_id);}
 	
 	vec2 uv = idx_to_uv(idx); // can current group_id move nw
-	if (!nw_dir_allowed(uv)) 	  {return uvec2(uint(false), group_id);}
-	
 	vec2 tl_uv = idx_to_uv(tl_idx);
+	if (!nw_dir_allowed(uv) && !se_dir_allowed(tl_uv)) 	  {return uvec2(uint(false), group_id);}
+	
 	uvec3 cm_px_struct = read_cm0(tl_uv);
 	bool barrier = bool(cm_px_struct.z);
-	if (barrier) 				  {return uvec2(uint(false), group_id);}
+	if (barrier) 				  						  {return uvec2(uint(false), group_id);}
 	
 	uint tl_group_id = cm_px_struct.x;
 	return uvec2(uint(true), tl_group_id);
@@ -182,15 +204,15 @@ uvec2 t_search_at(uint group_id) {
 	*/
 	ivec2 idx = ivec2(extract_idx(group_id));
 	ivec2 t_idx = idx + T_CELL_SHIFT;
-	if (!in_lower_bounds(t_idx)) {return uvec2(uint(false), group_id);}
+	if (!in_lower_bounds(t_idx)) 					{return uvec2(uint(false), group_id);}
 	
 	vec2 uv = idx_to_uv(idx); // can current group_id move n
-	if (!n_dir_allowed(uv)) 	  {return uvec2(uint(false), group_id);}
-	
 	vec2 t_uv = idx_to_uv(t_idx);
+	if (!n_dir_allowed(uv) && !s_dir_allowed(t_uv)) {return uvec2(uint(false), group_id);}
+
 	uvec3 cm_px_struct = read_cm0(t_uv);
 	bool barrier = bool(cm_px_struct.z);
-	if (barrier) 				  {return uvec2(uint(false), group_id);}
+	if (barrier) 				  					{return uvec2(uint(false), group_id);}
 	
 	uint t_group_id = cm_px_struct.x;
 	return uvec2(uint(true), t_group_id);
@@ -206,12 +228,12 @@ uvec2 tr_search_at(uint group_id) {
 	if (!in_lower_bounds(tr_idx) || !in_upper_bounds(tr_idx)) {return uvec2(uint(false), group_id);}
 	
 	vec2 uv = idx_to_uv(idx); // can current group_id move ne
-	if (!ne_dir_allowed(uv)) 	  {return uvec2(uint(false), group_id);}
-	
 	vec2 tr_uv = idx_to_uv(tr_idx);
+	if (!ne_dir_allowed(uv) && !sw_dir_allowed(tr_uv)) 	     {return uvec2(uint(false), group_id);}
+	
 	uvec3 cm_px_struct = read_cm0(tr_uv);
 	bool barrier = bool(cm_px_struct.z);
-	if (barrier) 				  {return uvec2(uint(false), group_id);}
+	if (barrier) 				 							 {return uvec2(uint(false), group_id);}
 	
 	uint tr_group_id = cm_px_struct.x;
 	return uvec2(uint(true), tr_group_id);
@@ -223,15 +245,15 @@ uvec2 l_search_at(uint group_id) {
 	*/
 	ivec2 idx = ivec2(extract_idx(group_id));
 	ivec2 l_idx = idx + L_CELL_SHIFT;
-	if (!in_lower_bounds(l_idx)) {return uvec2(uint(false), group_id);}
+	if (!in_lower_bounds(l_idx)) 						  {return uvec2(uint(false), group_id);}
 	
 	vec2 uv = idx_to_uv(idx); // can current group_id move n
-	if (!w_dir_allowed(uv)) 	  {return uvec2(uint(false), group_id);}
-	
 	vec2 l_uv = idx_to_uv(l_idx);
+	if (!w_dir_allowed(uv) && !e_dir_allowed(l_uv)) 	  {return uvec2(uint(false), group_id);}
+	
 	uvec3 cm_px_struct = read_cm0(l_uv);
 	bool barrier = bool(cm_px_struct.z);
-	if (barrier) 				  {return uvec2(uint(false), group_id);}
+	if (barrier) 				  						  {return uvec2(uint(false), group_id);}
 	
 	uint l_group_id = cm_px_struct.x;
 	return uvec2(uint(true), l_group_id);

@@ -58,7 +58,7 @@ static func bit_str_create(bit_str: String) -> DirectionColor:
 	dir_color.dir_bit_str = bit_str
 	return dir_color
 		
-static func string_create(d: String, multi_dir = true) -> DirectionColor:
+static func string_create(d: String, multi_dir: bool = true) -> DirectionColor:
 	var bit_str = NONE
 	if not DIR_STR_MAP.has(d): 
 		push_warning("INPUT: [%s] PROBLEM: [%s] RESULT: [%s]" % [d, "no valid DIR_STR_MAP", "returned empty DirectionColor"]);
