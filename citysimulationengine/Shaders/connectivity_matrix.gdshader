@@ -272,7 +272,6 @@ void fragment() {
 			bool did_find = bool(l_search_results.x);
 			if (did_find) {new_group_id = l_search_results.y; new_delta = true;}
 		}
-		
 	}
 	
 	cm_px_struct.x = new_group_id;
