@@ -14,6 +14,9 @@ var cm1_tex: ImageTexture
 var init_cm0_img: Image #need this to show the very first cm0
 var cm1_img: Image #need this so I have somthing to read pixels
 var iteration: int = 0
+var use_big_print: bool = false
+var big_print_col_step: int = 100
+var big_print_row_step: int = 100
 
 
 # Tests:
@@ -31,12 +34,39 @@ var iteration: int = 0
 
 
 func _ready() -> void:
+	## Preformace Benchmark: takes around 257.58ms to handle a 4000x4000 iteration loop once with no actions. 
+	#var start := Time.get_ticks_usec()
+	#for x in 4000:
+		#for y in 4000:
+			#pass
+			#
+	#var end := Time.get_ticks_usec()
+	#print("processing time: ", (end - start) / 1000.0, " ms")
+	
+	## Preformace Benchmark: takes around 3230.928ms to handle a 4000x4000 iteration loop once. 
+	#var start2 := Time.get_ticks_usec()
+	#for x in 4000:
+		#for y in 4000:
+			#var z: int = 0
+			#if z == 1: pass
+			#elif z == 1: pass
+			#elif z == 1: pass
+			#elif z == 1: pass
+			#elif z == 1: pass
+			#elif z == 1: pass
+			#elif z == 1: pass
+			#elif z == 1: pass
+			#else: z += 1
+			#
+	#var end2 := Time.get_ticks_usec()
+	#print("processing time: ", (end2 - start2) / 1000.0, " ms")
+	
 	## (PASS) Test 1: Expect all group_id = 0
-	#var size: Vector2i = Vector2i(10,10)
-	#var dir_option: String = "all"
-	#var barrier: bool = false
-	#fill_dir(size, dir_option)
-	#fill_cm0(size, barrier)
+	var size: Vector2i = Vector2i(10,10)
+	var dir_option: String = "all"
+	var barrier: bool = false
+	fill_dir(size, dir_option)
+	fill_cm0(size, barrier)
 	
 	## (PASS) Test 2: Expect no change
 	#var size: Vector2i = Vector2i(10,10)
@@ -92,16 +122,77 @@ func _ready() -> void:
 	#fill_dir(size, dir_option, multi_dir)
 	#fill_cm0(size, barrier)
 	
-	## () Test 9: 1 + 2(L-1) diagonal groups where L is the Lenght of the square (so 19 for L = 10)
-	var size: Vector2i = Vector2i(10,10)
-	var dir_option: String = "nw"
-	var multi_dir: bool = false
-	var barrier: bool = false
-	fill_dir(size, dir_option, multi_dir)
-	fill_cm0(size, barrier)
+	## (PASS) Test 9: 1 + 2(L-1) diagonal groups where L is the Lenght of the square (so 19 for L = 10)
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "nw"
+	#var multi_dir: bool = false
+	#var barrier: bool = false
+	#fill_dir(size, dir_option, multi_dir)
+	#fill_cm0(size, barrier)
 	
-	#try it with ne, and nw, se, sw
+	## (PASS) Test 10: 1 + 2(L-1) diagonal groups where L is the Lenght of the square (so 19 for L = 10)
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "se"
+	#var multi_dir: bool = false
+	#var barrier: bool = false
+	#fill_dir(size, dir_option, multi_dir)
+	#fill_cm0(size, barrier)
 	
+	## (PASS) Test 11: 1 + 2(L-1) diagonal groups where L is the Lenght of the square (so 19 for L = 10)
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "ne"
+	#var multi_dir: bool = false
+	#var barrier: bool = false
+	#fill_dir(size, dir_option, multi_dir)
+	#fill_cm0(size, barrier)
+	
+	## (PASS) Test 12: 1 + 2(L-1) diagonal groups where L is the Lenght of the square (so 19 for L = 10)
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "sw"
+	#var multi_dir: bool = false
+	#var barrier: bool = false
+	#fill_dir(size, dir_option, multi_dir)
+	#fill_cm0(size, barrier)
+	
+	## (PASS) Test 13: 4 quadrents all with only East direction allowed, expect 18 horizontal groups
+	#var size: Vector2i = Vector2i(10,10)
+	#var dir_option: String = "e"
+	#var multi_dir: bool = false
+	#var dividers_col: Array[int] = [4]
+	#var dividers_row: Array[int] = [5]
+	#fill_dir(size, dir_option, multi_dir)
+	#fill_cm0_with_dividers(size, dividers_col, dividers_row)
+	
+	## (PASS) Test 14: custom 10x10 graph of a ccw loop at the outer edges, and then no directios inside
+	#var size: Vector2i = Vector2i(10,10)
+	#const TOP_ROW: Array =    ["s", "w", "w", "w", "w", "w", "w", "w", "w", "w"]
+	#const BODY_ROW: Array =   ["s",  "",  "",  "",  "",  "",  "",  "",  "", "n"]
+	#const BOTTOM_ROW: Array = ["e", "e", "e", "e", "e", "e", "e", "e", "e", "n"]
+	#var dir_map: Array[Array] = [TOP_ROW, BODY_ROW, BODY_ROW, BODY_ROW, BODY_ROW, BODY_ROW, BODY_ROW, BODY_ROW, BODY_ROW, BOTTOM_ROW]
+	#var multi_dir: bool = false
+	#var barrier: bool = false
+	#custom_fill_dir(dir_map, multi_dir)
+	#fill_cm0(size, barrier)
+	
+	## (PASS) Test 15: Test the time it takes per iteration with 1000 x 1000, write to an csv text file, print the time between iterations, epxect 10 iterations
+	#var size: Vector2i = Vector2i(1000,1000)
+	#use_big_print = true
+	#var dir_option: String = "all"
+	#var barrier: bool = false
+	#big_print_col_step = 100
+	#big_print_row_step = 100
+	#fill_dir(size, dir_option)
+	#fill_cm0(size, barrier)
+	
+	## (PASS) Test 15: 4000 x 4000, expect 12 iterations (12 iterations each at 33 ms)
+	#var size: Vector2i = Vector2i(4000, 4000)
+	#use_big_print = true
+	#var dir_option: String = "all"
+	#var barrier: bool = false
+	#big_print_col_step = 400
+	#big_print_row_step = 400
+	#fill_dir(size, dir_option)
+	#fill_cm0(size, barrier)
 	
 	# Needed for all Tests
 	process_cm.material.set_shader_parameter("dir", dir_tex)
@@ -109,20 +200,28 @@ func _ready() -> void:
 	process_cm.material.set_shader_parameter("cm0", cm0_tex) # **** this needs to go here
 	subviewport.size = size
 	process_cm.size = size
-	print_cm(init_cm0_img)
+	handle_print(init_cm0_img)
 	
 	
 func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("enter"):
+		var start := Time.get_ticks_usec()
 		#await get_tree().process_frame  # <-- Wait for shader to render
 		capture_cm1()
-		print_cm(cm1_img)
+		handle_print(cm1_img)
 		cm0_tex = cm1_tex
 		process_cm.material.set_shader_parameter("cm0", cm0_tex) # *****1 this needs to go after to do it in the right num of iterations
+		
+		var end := Time.get_ticks_usec()
+		print("Enter press processing time: ", (end - start) / 1000.0, " ms")
 
 """
 HELPERS
 """
+
+func handle_print(cm_img: Image) -> void:
+	if not use_big_print: print_cm(cm_img)
+	else: big_print_cm(cm_img)
 
 func pack_pixel(idx: int, delta: bool, barrier: bool) -> Color:
 	var idx_30bit: int = (idx & 0x3FFFFFFF) << 2 #should be the same as idx unless number is too large to be specified by 30 bit
@@ -169,6 +268,21 @@ func print_cm(cm: Image) -> void:
 		print(s)
 		
 	iteration += 1
+	
+func big_print_cm(cm: Image, col_step: int = big_print_col_step, row_step: int = big_print_row_step) -> void:
+	var w: int = cm.get_width()
+	var h: int = cm.get_height()
+	print("------------")
+	print("iteration: ", iteration)
+	for r in range(0, h, row_step):
+		var s := ""
+		for c in range(0, w, col_step):
+			var px_struct: Vector3i = extract_px(cm.get_pixel(c, r))
+			var contents := (str(px_struct.x) + ", " + str(px_struct.z)).lpad(3)
+			s += "(%s) " % [contents]
+		print(s)
+
+	iteration += 1
 		
 func capture_cm1() -> void:
 	var cm1: Image = subviewport.get_viewport().get_texture().get_image()
@@ -179,6 +293,19 @@ func fill_dir(size: Vector2i, dir_option: String, multi_dir = true) -> void:
 	var dir: Image = Image.create_empty(size.x, size.y, false, DirectionColor.IMAGE_FORMAT)
 	dir.fill(DirectionColor.string_create(dir_option, multi_dir).get_color())
 	dir_tex = ImageTexture.create_from_image(dir)
+	
+func custom_fill_dir(dir_map: Array[Array], multi_dir = true) -> void:
+	var x: int = dir_map[0].size()
+	var y: int = dir_map.size()
+	var dir: Image = Image.create_empty(x, y, false, DirectionColor.IMAGE_FORMAT)
+	for r in y:
+		for c in x:
+			var dir_option: String = dir_map[r][c]
+			if dir_option != "":
+				dir.set_pixel(c,r, DirectionColor.string_create(dir_option, multi_dir).get_color())
+	dir_tex = ImageTexture.create_from_image(dir)	
+			
+			
 	
 func _simple_fill_cm0(size: Vector2i, delta: bool, barrier: bool) -> Image:
 	var cm0: Image = Image.create_empty(size.x, size.y, false, Image.FORMAT_RGBA8)
